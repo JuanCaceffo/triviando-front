@@ -46,12 +46,6 @@ const FormRegister = () => {
     }
   };
 
-  // const handleGoogleRegister = () => {
-  //   console.log('Register with Google');
-  //   //TODO: Implementar validacion con google cuando corresponda
-  //   router.push(`/${username}/topics`);
-  // };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <CardContent className="space-y-4">
@@ -135,24 +129,6 @@ const FormRegister = () => {
             disabled={isFetching}
           >
             Crear Cuenta
-          </Button>
-        </AnimatedContainer>
-
-        <div className="relative w-full flex items-center gap-2 my-2 cursor-default">
-          <div className="flex-1 border-t border-gray-300"></div>
-          <span className="text-xs text-gray-500">o continúa con</span>
-          <div className="flex-1 border-t border-gray-300"></div>
-        </div>
-
-        <AnimatedContainer animation="slideUp" delay={0.7} className="w-full">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full border-cyan-200 hover:bg-cyan-50 transition-all duration-300 cursor-pointer"
-            disabled
-          >
-            <FaGoogle className="mr-2 h-4 w-4 text-red-500" />
-            Continuar con Google
           </Button>
         </AnimatedContainer>
 
