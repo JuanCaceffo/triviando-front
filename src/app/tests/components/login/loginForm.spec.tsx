@@ -120,7 +120,7 @@ describe('LoginPage', () => {
     });
   });
 
-  it('Google login button is disabled', () => {
+  it('Google login button is disabled until GIS is ready', () => {
     render(<LoginPage />);
     const googleBtn = screen.getByRole('button', { name: /continuar con google/i });
     expect(googleBtn).toBeDisabled();

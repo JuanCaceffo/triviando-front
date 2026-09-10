@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FaGoogle } from 'react-icons/fa';
 import {
@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [isFetching, setIsFetching] = useState(false);
+  const [isGoogleReady, setIsGoogleReady] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +42,74 @@ export default function LoginPage() {
     }
   };
 
+  useEffect(() => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+    if (!clientId) {
+      return;
+    }
+
+    let isUnmounted = false;
+
+    const initializeGoogleIdentityServices = () => {
+      if (isUnmounted || !window.google) {
+        return;
+      }
+
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: async ({ credential }) => {
+          if (!credential) {
+            return;
+          }
+
+          setIsFetching(true);
+          try {
+            const { username } = await loginService.loginWithGoogle(credential);
+            toast.success('Inicio de sesión exitoso');
+            window.location.href = `/${username}/topics`;
+          } catch (error) {
+            handleError(error);
+          } finally {
+            setIsFetching(false);
+          }
+        },
+      });
+
+      setIsGoogleReady(true);
+    };
+
+    if (window.google) {
+      initializeGoogleIdentityServices();
+      return () => {
+        isUnmounted = true;
+      };
+    }
+
+    const script = document.createElement('script');
+    script.id = 'google-identity-services';
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogleIdentityServices;
+    script.onerror = () => {
+      if (!isUnmounted) {
+        toast.error('No se pudo cargar Google. Reintentá más tarde.');
+      }
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      isUnmounted = true;
+    };
+  }, []);
+
   const handleGoogleLogin = () => {
-    // Handle Google login logic here
-    // router.push('/topics');
+    if (!isGoogleReady || !window.google) {
+      return;
+    }
+
+    window.google.accounts.id.prompt();
   };
 
   return (
@@ -116,7 +182,7 @@ export default function LoginPage() {
                   variant="outline"
                   className="w-full border-cyan-200 hover:bg-cyan-50 transition-all duration-300  "
                   onClick={handleGoogleLogin}
-                  disabled
+                  disabled={isFetching || !isGoogleReady}
                 >
                   <FaGoogle className="mr-2 h-4 w-4 text-red-500" />
                   Continuar con Google

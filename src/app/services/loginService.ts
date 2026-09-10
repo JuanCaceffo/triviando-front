@@ -5,6 +5,7 @@ import { useUserStore } from '../stores/userStore';
 import { cloudinaryAvatarService } from './cloudinaryAvatarService';
 import { getUserInfoFromToken, isTokenExpired } from '../security/jwtUtils';
 import { userService } from './userService';
+import { googleAuthService } from './googleAuthService';
 
 interface LoginResponse {
   token: string;
@@ -12,9 +13,19 @@ interface LoginResponse {
 
 class LoginService extends BaseService {
   async login(credentials: LoginCredentials): Promise<Usuario> {
-    // El backend devuelve un objeto con la propiedad token
     const { data } = await this.axiosService.post<LoginResponse>(`/users/login`, credentials);
-    const token = data.token;
+    return this.completeLogin(data.token);
+  }
+
+  async loginWithGoogle(credential: string): Promise<Usuario> {
+    const token = await googleAuthService.authenticate(credential);
+    return this.completeLogin(token);
+  }
+
+  private async completeLogin(token: string): Promise<Usuario> {
+    if (!token) {
+      throw new Error('No se recibió un JWT válido del servidor');
+    }
 
     // Guardar token en cookie con nombre estándar
     Cookies.set('token', token, {
