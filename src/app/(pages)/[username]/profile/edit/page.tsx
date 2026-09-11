@@ -5,7 +5,7 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Camera, User, Mail, Lock, Save, Phone, Calendar } from 'lucide-react';
+import { ArrowLeft, Camera, User, Mail, Save, Phone, Calendar } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { CldUploadWidget } from 'next-cloudinary';
 import { CloudinaryAvatar } from '@/app/components/CloudinaryAvatar';
@@ -48,7 +48,6 @@ export default function EditProfile() {
     countryCode: '',
     phoneNumber: '',
     birthDate: '',
-    currentPassword: '',
   });
   const [originalUsername, setOriginalUsername] = useState('');
   const [cloudinaryError, setCloudinaryError] = useState<string | null>(null);
@@ -94,7 +93,6 @@ export default function EditProfile() {
           countryCode: (userData.countryCode || '').trim(),
           phoneNumber: (userData.phoneNumber || '').replace(/[^0-9]/g, ''), // Limpia guiones y otros caracteres
           birthDate,
-          currentPassword: '',
         });
       }
     };
@@ -202,10 +200,6 @@ export default function EditProfile() {
       }
     }
 
-    if (!formData.currentPassword) {
-      newErrors.currentPassword = 'Debes ingresar tu contraseña actual para confirmar los cambios';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -234,7 +228,6 @@ export default function EditProfile() {
       birthDate: formData.birthDate,
       phoneNumber: formData.phoneNumber,
       countryCode: formData.countryCode,
-      currentPassword: formData.currentPassword,
       avatar: avatarPublicId || userData.avatar,
     };
 
@@ -476,38 +469,6 @@ export default function EditProfile() {
                     {errors.birthDate && (
                       <p className="text-red-500 text-xs mt-1">{errors.birthDate}</p>
                     )}
-                  </div>
-
-                  <div className="pt-4 border-t border-cyan-200">
-                    <h3 className="text-cyan-700 font-medium mb-2">Confirmación de seguridad</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Por tu seguridad, necesitamos que confirmes tu contraseña actual antes de
-                      guardar los cambios.
-                    </p>
-
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="currentPassword"
-                        className="text-cyan-700 flex items-center gap-2"
-                      >
-                        <Lock className="h-4 w-4" />
-                        Contraseña actual
-                      </Label>
-                      <Input
-                        id="currentPassword"
-                        name="currentPassword"
-                        type="password"
-                        placeholder="Ingresa tu contraseña actual"
-                        value={formData.currentPassword}
-                        onChange={handleInputChange}
-                        className={`border-cyan-200 focus:border-cyan-400 ${
-                          errors.currentPassword ? 'border-red-500' : ''
-                        }`}
-                      />
-                      {errors.currentPassword && (
-                        <p className="text-red-500 text-xs mt-1">{errors.currentPassword}</p>
-                      )}
-                    </div>
                   </div>
                 </CardContent>
 

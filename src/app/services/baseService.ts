@@ -33,8 +33,8 @@ export class BaseService {
     const isServer = typeof window === 'undefined';
 
     const host = isServer
-      ? process.env.API_URL_SERVER ?? DEFAULT_API_URL
-      : process.env.NEXT_PUBLIC_API_URL_CLIENT ?? DEFAULT_API_URL;
+      ? (process.env.API_URL_SERVER ?? DEFAULT_API_URL)
+      : (process.env.NEXT_PUBLIC_API_URL_CLIENT ?? DEFAULT_API_URL);
 
     return `${host}/api/v1`;
   }

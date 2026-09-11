@@ -36,7 +36,6 @@ export interface IUpdateUserData {
   birthDate: string; // ISO: YYYY-MM-DD
   phoneNumber: string;
   countryCode: string;
-  currentPassword: string;
   avatar?: string; // Cloudinary public_id for the avatar image
 }
 
@@ -136,7 +135,15 @@ class UserService extends BaseService {
 
   editUserById = async (userData: Partial<IUpdateUserData>) => {
     try {
-      const { data } = await this.axiosService.put(`/users`, userData);
+      const { data } = await this.axiosService.put<{ token: string }>(`/users`, userData);
+      const token = data.token;
+
+      // Guardar token en cookie por si cambia el nombre de usuario
+      Cookies.set('token', token, {
+        expires: 1,
+        path: '/',
+        sameSite: 'lax',
+      });
 
       // Obtener los datos actualizados del servidor para asegurar consistencia
       if (userData.id) {
@@ -158,8 +165,6 @@ class UserService extends BaseService {
           ...userForStore,
         });
       }
-
-      return data;
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response?.data?.error) {
         throw new Error(error.response.data.error);
