@@ -46,10 +46,13 @@ export class CloudinaryServerService {
       return avatars;
     } catch {
       // Devolver objeto vacío si hay error
-      return userIds.reduce((acc, userId) => {
-        acc[userId] = null;
-        return acc;
-      }, {} as Record<number, string | null>);
+      return userIds.reduce(
+        (acc, userId) => {
+          acc[userId] = null;
+          return acc;
+        },
+        {} as Record<number, string | null>,
+      );
     }
   }
 

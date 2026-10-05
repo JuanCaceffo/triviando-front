@@ -275,10 +275,7 @@ export default function EditProfile() {
             <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-2xl text-cyan-700">Editar Perfil</CardTitle>
-                <CardDescription>
-                  Actualiza tu información personal. Necesitarás tu contraseña actual para confirmar
-                  los cambios.
-                </CardDescription>
+                <CardDescription>Actualiza tu información personal.</CardDescription>
               </CardHeader>
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-6">
