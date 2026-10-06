@@ -1,6 +1,11 @@
 services:
   frontend:
-    build: .
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_API_URL_CLIENT: ${NEXT_PUBLIC_API_URL_CLIENT}
+        NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     env_file: .env
     ports:
       - '3000:3000'
