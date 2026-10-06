@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/app/components/ui/button';
 import { CloudinaryAvatar } from '@/app/components/CloudinaryAvatar';
-import { Trophy, LogOut, User, ChevronDown, Crown } from 'lucide-react';
+import { Trophy, LogOut, User, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedContainer from '@/app/components/AnimatedContainer';
 import { loginService } from '@/app/services/loginService';
