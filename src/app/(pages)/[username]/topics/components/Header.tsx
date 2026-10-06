@@ -82,10 +82,10 @@ const Header = () => {
     router.push(`/${username}/leaderboard`);
   };
 
-  const handleSubscription = () => {
-    setIsOpen(false);
-    router.push('/payment');
-  };
+  // const handleSubscription = () => {
+  //   setIsOpen(false);
+  //   router.push('/payment');
+  // };
 
   return (
     <header className="p-4 flex flex-col md:flex-row-reverse gap-4 justify-between">

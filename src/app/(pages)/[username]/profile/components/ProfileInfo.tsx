@@ -14,7 +14,7 @@ import { useUserAvatar } from '@/app/hooks/useUserAvatar';
 import { ProfileInfoSkeleton } from './ProfileInfoSkeleton';
 import AnimatedContainer from '@/app/components/AnimatedContainer';
 import { loginService } from '@/app/services/loginService';
-import { AccountBadge } from '@/app/components/AccountBadge';
+// import { AccountBadge } from '@/app/components/AccountBadge';
 
 const ProfileInfo = () => {
   const { username } = useParams();
