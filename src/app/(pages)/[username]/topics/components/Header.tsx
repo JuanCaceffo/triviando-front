@@ -12,7 +12,7 @@ import { useCurrentUser } from '@/app/utils/auth';
 import { useInitializeUser } from '@/app/hooks/useInitializeUser';
 import { useUserAvatar } from '@/app/hooks/useUserAvatar';
 import Image from 'next/image';
-import AccountBadge from '@/app/components/AccountBadge';
+// import AccountBadge from '@/app/components/AccountBadge';
 
 const Header = () => {
   const router = useRouter();
@@ -90,12 +90,12 @@ const Header = () => {
   return (
     <header className="p-4 flex flex-col md:flex-row-reverse gap-4 justify-between">
       <div className="flex items-center gap-4 justify-between md:justify-end w-full">
-        <AccountBadge
+        {/* <AccountBadge
           account={user?.account ?? 'FREE'}
           size="sm"
           showIcon={true}
           className="shrink-0"
-        />
+        /> */}
         <div className="flex items-center gap-4 justify-end">
           {/* Botón de ranking */}
           <AnimatedContainer animation="fade">
@@ -158,13 +158,13 @@ const Header = () => {
                       <User className="mr-3 h-4 w-4 text-teal-500" />
                       Perfil
                     </button>
-                    <button
+                    {/* <button
                       onClick={handleSubscription}
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                       <Crown className="mr-3 h-4 w-4 text-cyan-500" />
                       Suscripción
-                    </button>
+                    </button> */}
                   </div>
 
                   {/* Separador */}

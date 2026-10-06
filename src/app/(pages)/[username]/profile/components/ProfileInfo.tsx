@@ -99,13 +99,13 @@ const ProfileInfo = () => {
               <AnimatedContainer animation="slideLeft" delay={0.2}>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
                   <h1 className="text-2xl font-bold text-[#3c096c]">{user.username}</h1>
-                  {user.account && (
+                  {/* {user.account && (
                     <AccountBadge
                       account={user.account}
                       size="sm"
                       className="self-center sm:self-auto"
                     />
-                  )}
+                  )} */}
                 </div>
               </AnimatedContainer>
 
