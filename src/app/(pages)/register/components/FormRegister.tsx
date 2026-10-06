@@ -7,7 +7,6 @@ import { Label } from '@/app/components/ui/label';
 import AnimatedContainer from '@/app/components/AnimatedContainer';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FaGoogle } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

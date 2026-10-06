@@ -1,20 +1,29 @@
-# Usamos una imagen de Node como base
-FROM node:23-slim
-
-# Creamos un directorio dentro del contenedor para la app
+FROM node:22-bookworm-slim AS dependencies
 WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Copiamos el package.json y package-lock.json
-COPY package*.json ./
-
-# Instalamos las dependencias
-RUN npm install
-
-# Copiamos el resto del código
+FROM node:22-bookworm-slim AS builder
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
+RUN npm run build
 
-# Exponemos el puerto 3000
+FROM node:22-bookworm-slim AS runner
+WORKDIR /app
+ENV NODE_ENV=production \
+	NEXT_TELEMETRY_DISABLED=1 \
+	HOSTNAME=0.0.0.0 \
+	PORT=3000
+
+RUN groupadd --system --gid 1001 nodejs \
+	&& useradd --system --uid 1001 --gid nodejs nextjs
+
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
 EXPOSE 3000
-
-# Comando para levantar la app
-CMD ["npm", "run", "dev"]
+CMD ["node", "server.js"]
