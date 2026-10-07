@@ -9,7 +9,7 @@ cloudinary.config({
 });
 
 /**
- * GET /api/user/avatar?userId=123
+ * GET /frontend-api/user/avatar?userId=123
  * Busca el avatar de un usuario en Cloudinary usando el user_id en los metadatos
  */
 export async function GET(request: NextRequest) {

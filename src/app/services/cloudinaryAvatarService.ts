@@ -26,7 +26,7 @@ export class CloudinaryAvatarService {
 
     try {
       // Usar nuestro endpoint de API interno para buscar el avatar
-      const response = await fetch(`/api/user/avatar?userId=${userId}`);
+      const response = await fetch(`/frontend-api/user/avatar?userId=${userId}`);
 
       if (!response.ok) {
         return null;
