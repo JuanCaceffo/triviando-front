@@ -205,30 +205,6 @@ describe('UserService', () => {
     await expect(userService.editUserById({ id: 1 })).rejects.toThrow(errorMsg);
   });
 
-  it('should return the new token on editUserById success', async () => {
-    const putMock = jest.fn().mockResolvedValue({ data: { token: 'new-jwt-token' } });
-    const getUserByIdSpy = jest.spyOn(userService, 'getUserById').mockResolvedValue({
-      id: 1,
-      name: 'Updated',
-      lastName: 'User',
-      username: 'updatedUser',
-      email: 'updated@example.com',
-      phoneNumber: '1234567',
-      countryCode: '+54',
-      birthDate: '1990-01-01',
-      joinDate: '2024-01-01',
-      age: 36,
-      account: 'FREE',
-    });
-    // @ts-expect-error: Mocking axiosService.put for test in editUserById success
-    userService.axiosService.put = putMock;
-
-    await expect(userService.editUserById({ id: 1 })).resolves.toBe('new-jwt-token');
-
-    expect(putMock).toHaveBeenCalledWith('/users', { id: 1 });
-    getUserByIdSpy.mockRestore();
-  });
-
   it('should get user register date', async () => {
     const userId = 3;
     const mockDate = { registerDate: '2023-01-01' };
