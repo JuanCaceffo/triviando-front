@@ -88,8 +88,8 @@ const Header = () => {
   // };
 
   return (
-    <header className="p-4 flex flex-col md:flex-row-reverse gap-4 justify-between">
-      <div className="flex items-center gap-4 justify-between md:justify-end w-full">
+    <header className="p-4 flex flex-row-reverse items-center gap-4 justify-between">
+      <div className="flex items-center gap-4 justify-between md:justify-end w-auto md:w-full">
         {/* <AccountBadge
           account={user?.account ?? 'FREE'}
           size="sm"
