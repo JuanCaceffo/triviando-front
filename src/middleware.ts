@@ -39,7 +39,9 @@ export function middleware(request: NextRequest) {
   if (isPublicRoute) {
     return NextResponse.next();
   }
-
+  if (url.pathname === '/frontend-api/user/avatar') {
+    return NextResponse.next();
+  }
   // Si es una ruta protegida especial, verificar solo autenticación
   if (isSpecialProtectedRoute) {
     if (!tokenCookie) {
