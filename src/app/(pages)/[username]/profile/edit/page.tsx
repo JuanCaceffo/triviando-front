@@ -256,6 +256,7 @@ export default function EditProfile() {
       <header className="p-4">
         <Link
           href={`/${formData.username}/profile`}
+          prefetch={false}
           className="inline-flex items-center text-white hover:text-white/80 transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
