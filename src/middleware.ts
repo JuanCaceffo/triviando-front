@@ -26,7 +26,15 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl;
 
   // Rutas públicas que no requieren autenticación
-  const publicRoutes = ['/login', '/register', '/policy', '/terms', '/unauthorized'];
+  const publicRoutes = [
+    '/login',
+    '/register',
+    '/policy',
+    '/terms',
+    '/unauthorized',
+    '/forgot-password',
+    '/reset-password',
+  ];
   const isPublicRoute = publicRoutes.some((route) => url.pathname.startsWith(route));
 
   // Rutas protegidas que requieren autenticación pero no siguen el patrón /{username}/...

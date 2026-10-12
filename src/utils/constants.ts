@@ -49,6 +49,34 @@ export const APP_TEXTS = {
       and: 'y',
       privacyLink: 'Política de Privacidad',
     },
+    forgotPassword: {
+      identifierTitle: 'Recuperá tu contraseña',
+      identifierSubtitle: 'Ingresá tu email o usuario y te mandamos un código para verificar que sos vos',
+      identifierLabel: 'Email o usuario',
+      identifierPlaceholder: 'triviando@email.com o tu usuario',
+      sendCodeButton: 'Enviar código',
+      codeTitle: 'Ingresá el código',
+      codeSubtitle: 'Te lo mandamos a {identifier}. Caduca en 15 minutos.',
+      codeLabel: 'Código de 6 dígitos',
+      continueButton: 'Continuar',
+      resend: 'Reenviar código',
+      resendIn: 'Reenviar en {seconds} s',
+      useOtherIdentifier: 'Usar otro email o usuario',
+      backToLogin: 'Volver al inicio de sesión',
+      sentNotice:
+        'Si existe una cuenta con esos datos, te enviamos un código a tu correo. Revisá también el spam.',
+    },
+    resetPassword: {
+      title: 'Elegí tu contraseña nueva',
+      subtitle: 'La contraseña anterior deja de funcionar en cuanto la guardes.',
+      newPasswordLabel: 'Contraseña nueva',
+      confirmPasswordLabel: 'Repetí la contraseña',
+      submitButton: 'Guardar contraseña',
+      invalidTokenTitle: 'El enlace de recuperación expiró',
+      invalidTokenBody: 'Los enlaces duran 10 minutos. Pedí un código nuevo para continuar.',
+      requestNewCode: 'Pedir un código nuevo',
+      backToLogin: 'Volver al inicio de sesión',
+    },
   },
 
   // Temas
@@ -145,6 +173,7 @@ export const APP_TEXTS = {
     login: 'Inicio de sesión exitoso',
     register: 'Cuenta creada exitosamente',
     logout: 'Sesión cerrada correctamente',
+    passwordReset: 'Contraseña actualizada',
   },
 
   // Botones comunes
@@ -288,6 +317,12 @@ export const formatText = {
       .replace('{total}', total.toString()),
 
   score: (score: number) => APP_TEXTS.results.score.replace('{score}', score.toString()),
+
+  codeSubtitle: (identifier: string) =>
+    APP_TEXTS.auth.forgotPassword.codeSubtitle.replace('{identifier}', identifier),
+
+  resendIn: (seconds: number) =>
+    APP_TEXTS.auth.forgotPassword.resendIn.replace('{seconds}', seconds.toString()),
 
   correctAnswers: (correct: number, total: number) =>
     APP_TEXTS.results.correctAnswers

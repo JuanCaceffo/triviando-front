@@ -16,6 +16,7 @@ import { loginService } from '@/app/services/loginService';
 import { handleError } from '@/app/utils/errorHandler';
 import { toast } from 'react-toastify';
 import Logo from '@/app/components/logo';
+import { APP_TEXTS } from '@/utils/constants';
 
 export default function LoginPage() {
   const [user, setUser] = useState('');
@@ -142,10 +143,10 @@ export default function LoginPage() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Contraseña</Label>
                   <Link
-                    href="/#"
+                    href="/forgot-password"
                     className="text-xs text-cyan-600 hover:text-cyan-800 transition-colors"
                   >
-                    ¿Olvidaste tu contraseña?
+                    {APP_TEXTS.auth.login.forgotPassword}
                   </Link>
                 </div>
                 <Input
