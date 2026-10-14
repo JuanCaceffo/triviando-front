@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/app/components/ui/card';
-import { Input } from '@/app/components/ui/input';
+import { PasswordInput } from '@/app/components/ui/password-input';
 import { Label } from '@/app/components/ui/label';
 import { Button } from '@/app/components/ui/button';
 import { passwordService } from '@/app/services/passwordService';
@@ -99,9 +99,8 @@ export default function ResetPasswordForm() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="new-password">{texts.newPasswordLabel}</Label>
-            <Input
+            <PasswordInput
               id="new-password"
-              type="password"
               autoComplete="new-password"
               autoFocus
               {...register('password')}
@@ -112,9 +111,8 @@ export default function ResetPasswordForm() {
 
           <div className="space-y-2">
             <Label htmlFor="confirm-password">{texts.confirmPasswordLabel}</Label>
-            <Input
+            <PasswordInput
               id="confirm-password"
-              type="password"
               autoComplete="new-password"
               {...register('confirmPassword')}
               className="border-cyan-200 focus:border-cyan-400"

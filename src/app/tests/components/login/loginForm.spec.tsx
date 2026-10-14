@@ -60,7 +60,7 @@ describe('LoginPage', () => {
   it('renders form fields and buttons', () => {
     render(<LoginPage />);
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/contraseña/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^contraseña$/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /iniciar sesión/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /continuar con google/i })).toBeInTheDocument();
     expect(screen.getByText(/¿no tienes una cuenta/i)).toBeInTheDocument();
@@ -70,7 +70,7 @@ describe('LoginPage', () => {
   it('updates username and password fields', () => {
     render(<LoginPage />);
     const usernameInput = screen.getByLabelText(/username/i);
-    const passwordInput = screen.getByLabelText(/contraseña/i);
+    const passwordInput = screen.getByLabelText(/^contraseña$/i);
 
     fireEvent.change(usernameInput, { target: { value: 'test@username.com' } });
     fireEvent.change(passwordInput, { target: { value: '123456' } });
@@ -90,7 +90,7 @@ describe('LoginPage', () => {
     (loginService.login as jest.Mock).mockResolvedValue({ username: 'facundo' });
     render(<LoginPage />);
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'a@b.com' } });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: 'pass' } });
+    fireEvent.change(screen.getByLabelText(/^contraseña$/i), { target: { value: 'pass' } });
     fireEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }));
 
     await waitFor(() => {
@@ -112,7 +112,7 @@ describe('LoginPage', () => {
     (loginService.login as jest.Mock).mockRejectedValue(error);
     render(<LoginPage />);
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'a@b.com' } });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: 'pass' } });
+    fireEvent.change(screen.getByLabelText(/^contraseña$/i), { target: { value: 'pass' } });
     fireEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }));
 
     await waitFor(() => {
@@ -136,5 +136,57 @@ describe('LoginPage', () => {
     render(<LoginPage />);
     const registerLink = screen.getByText(/regístrate/i);
     expect(registerLink).toHaveAttribute('href', '/register');
+  });
+
+  describe('password visibility toggle', () => {
+    it('password starts hidden with type="password"', () => {
+      render(<LoginPage />);
+      const passwordInput = screen.getByLabelText(/^contraseña$/i);
+      expect(passwordInput).toHaveAttribute('type', 'password');
+    });
+
+    it('renders the eye toggle button with accessible label', () => {
+      render(<LoginPage />);
+      expect(screen.getByRole('button', { name: /mostrar contraseña/i })).toBeInTheDocument();
+    });
+
+    it('shows password when clicking the eye button', () => {
+      render(<LoginPage />);
+      const passwordInput = screen.getByLabelText(/^contraseña$/i);
+
+      fireEvent.click(screen.getByRole('button', { name: /mostrar contraseña/i }));
+
+      expect(passwordInput).toHaveAttribute('type', 'text');
+    });
+
+    it('hides password again when clicking the eye button twice', () => {
+      render(<LoginPage />);
+      const passwordInput = screen.getByLabelText(/^contraseña$/i);
+
+      fireEvent.click(screen.getByRole('button', { name: /mostrar contraseña/i }));
+      expect(passwordInput).toHaveAttribute('type', 'text');
+
+      fireEvent.click(screen.getByRole('button', { name: /ocultar contraseña/i }));
+      expect(passwordInput).toHaveAttribute('type', 'password');
+    });
+
+    it('keeps the entered value when toggling visibility', () => {
+      render(<LoginPage />);
+      const passwordInput = screen.getByLabelText(/^contraseña$/i);
+
+      fireEvent.change(passwordInput, { target: { value: 'secreta123' } });
+      fireEvent.click(screen.getByRole('button', { name: /mostrar contraseña/i }));
+
+      expect((passwordInput as HTMLInputElement).value).toBe('secreta123');
+      expect(passwordInput).toHaveAttribute('type', 'text');
+    });
+
+    it('eye button does not submit the form', async () => {
+      render(<LoginPage />);
+
+      fireEvent.click(screen.getByRole('button', { name: /mostrar contraseña/i }));
+
+      expect(loginService.login).not.toHaveBeenCalled();
+    });
   });
 });

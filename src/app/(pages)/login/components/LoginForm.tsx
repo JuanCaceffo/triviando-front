@@ -11,6 +11,7 @@ import {
 } from '@/app/components/ui/card';
 import { Label } from '@/app/components/ui/label';
 import { Input } from '@/app/components/ui/input';
+import { PasswordInput } from '@/app/components/ui/password-input';
 import { Button } from '@/app/components/ui/button';
 import { loginService } from '@/app/services/loginService';
 import { handleError } from '@/app/utils/errorHandler';
@@ -149,9 +150,8 @@ export default function LoginPage() {
                     {APP_TEXTS.auth.login.forgotPassword}
                   </Link>
                 </div>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

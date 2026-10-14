@@ -3,6 +3,7 @@
 import { Button } from '@/app/components/ui/button';
 import { CardContent, CardFooter } from '@/app/components/ui/card';
 import { Input } from '@/app/components/ui/input';
+import { PasswordInput } from '@/app/components/ui/password-input';
 import { Label } from '@/app/components/ui/label';
 import AnimatedContainer from '@/app/components/AnimatedContainer';
 import Link from 'next/link';
@@ -73,9 +74,8 @@ const FormRegister = () => {
 
         <AnimatedContainer animation="slideRight" delay={0.4} className="space-y-2">
           <Label htmlFor="password">Contraseña</Label>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
             {...register('password')}
             className="border-cyan-200 focus:border-cyan-400"
           />
@@ -84,9 +84,8 @@ const FormRegister = () => {
 
         <AnimatedContainer animation="slideRight" delay={0.5} className="space-y-2">
           <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
-          <Input
+          <PasswordInput
             id="confirmPassword"
-            type="password"
             {...register('confirmPassword')}
             className="border-cyan-200 focus:border-cyan-400"
           />
