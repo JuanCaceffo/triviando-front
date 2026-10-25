@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 import { parserTopics } from './utils/helpers';
 import Header from './components/Header';
 import Filter from './components/Filter';
@@ -13,14 +14,23 @@ import { handleError } from '@/app/utils/errorHandler';
 import { useCurrentUserId } from '@/app/utils/auth';
 import { toast } from 'react-toastify';
 import { useTopicCreationStore } from '@/app/stores/topicCreationStore';
+import { waitForGenerationJob } from './utils/pollGenerationJob';
 
 export default function TopicsPage() {
   const userId = useCurrentUserId();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [topics, setTopics] = useState<ITopic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const { creatingTopics, setCreating, removeCreating, clearOldCreations, setRefreshCallback } =
-    useTopicCreationStore();
+  const {
+    creatingTopics,
+    setCreating,
+    removeCreating,
+    clearOldCreations,
+    setRefreshCallback,
+    setJob,
+    updateProgress,
+  } = useTopicCreationStore();
+  const resumedJobs = useRef(false);
   // Función para refrescar los tópicos
   const refreshTopics = async (): Promise<void> => {
     try {
@@ -95,6 +105,66 @@ export default function TopicsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creatingTopics.length, loading]); // Usar solo length para evitar loops
 
+  const applyGeneratedTopic = (name: string, result: ITopicDTO[] | null) => {
+    const created =
+      result?.find((topic) => topic.topic.toLowerCase() === name.toLowerCase()) ?? result?.[0];
+
+    if (!created) {
+      toast.error('No se pudo obtener el tópico generado. Intenta nuevamente.');
+      removeCreating(name);
+      return;
+    }
+
+    const newTopic: ITopic = {
+      name: created.topic,
+      icon: created.emoji,
+      color: '#06b6d4',
+      questionsCount: created.size,
+    };
+
+    setTopics((prev) =>
+      prev.some((topic) => topic.name.toLowerCase() === newTopic.name.toLowerCase())
+        ? prev
+        : [...prev, newTopic],
+    );
+
+    toast.success(`Tópico "${created.topic}" creado exitosamente.`);
+    removeCreating(name);
+  };
+
+  const watchGenerationJob = async (name: string, jobId: string) => {
+    try {
+      const job = await waitForGenerationJob(jobId, {
+        fetchJob: topicService.getGenerationJob,
+        onProgress: (progress) => updateProgress(name, progress),
+      });
+      applyGeneratedTopic(name, job.result);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        handleError(error);
+      } else {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'No se pudieron generar las preguntas a partir del archivo.',
+        );
+      }
+      removeCreating(name);
+    }
+  };
+
+  // Reanudar el seguimiento de generaciones que quedaron en curso tras un refresh
+  useEffect(() => {
+    if (!userId || resumedJobs.current) return;
+    resumedJobs.current = true;
+
+    const pending = useTopicCreationStore.getState().creatingTopics.filter((entry) => entry.jobId);
+    pending.forEach((entry) => {
+      watchGenerationJob(entry.name, entry.jobId as string);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
   const handleCreateTopic = async (name: string) => {
     if (!userId) {
       toast.error('Error: Usuario no autenticado');
@@ -133,6 +203,31 @@ export default function TopicsPage() {
       removeCreating(name);
     }
   };
+
+  const handleCreateTopicFromFile = async (name: string, file: File) => {
+    if (!userId) {
+      toast.error('Error: Usuario no autenticado');
+      return;
+    }
+
+    setCreating(name);
+
+    try {
+      const created = await topicService.generateTopicFromFile(name, file);
+      setJob(name, created.jobId);
+      await watchGenerationJob(name, created.jobId);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        handleError(error);
+      } else {
+        toast.error(
+          error instanceof Error ? error.message : 'No se pudo procesar el archivo seleccionado.',
+        );
+      }
+      removeCreating(name);
+    }
+  };
+
   const filteredTopics = topics.filter((topic) =>
     topic.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
@@ -156,6 +251,7 @@ export default function TopicsPage() {
             topics={filteredTopics}
             creatingTopics={currentlyCreating}
             onGenerateTopic={handleCreateTopic}
+            onGenerateFromFile={handleCreateTopicFromFile}
           />
         )}
       </main>

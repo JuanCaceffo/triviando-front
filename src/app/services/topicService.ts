@@ -1,4 +1,8 @@
 import { BaseService } from './baseService';
+import {
+  IGenerationJobCreatedDTO,
+  IGenerationJobDTO,
+} from '../(pages)/[username]/topics/types';
 
 class TopicService extends BaseService {
   getTopics = async ({ id }: { id: number }) => {
@@ -12,6 +16,21 @@ class TopicService extends BaseService {
       promptType: 'topicPrompter',
     });
 
+    return data;
+  };
+
+  generateTopicFromFile = async (name: string, file: File): Promise<IGenerationJobCreatedDTO> => {
+    const formData = new FormData();
+    formData.append('topic', name);
+    formData.append('file', file);
+
+    // No seteamos Content-Type: axios agrega el boundary de multipart.
+    const { data } = await this.axiosService.post('/preguntas/document/generate', formData);
+    return data;
+  };
+
+  getGenerationJob = async (jobId: string): Promise<IGenerationJobDTO> => {
+    const { data } = await this.axiosService.get(`/preguntas/document/jobs/${jobId}`);
     return data;
   };
 }

@@ -329,6 +329,59 @@ describe('topicCreationStore', () => {
     });
   });
 
+  describe('setJob y updateProgress', () => {
+    it('asocia un jobId al tópico en creación', () => {
+      const { result } = renderHook(() => useTopicCreationStore());
+
+      act(() => {
+        result.current.setCreating('Biología');
+        result.current.setJob('Biología', 'job1');
+      });
+
+      expect(result.current.creatingTopics[0].jobId).toBe('job1');
+      expect(result.current.creatingTopics[0].progress).toBe(0);
+    });
+
+    it('actualiza el progreso del job', () => {
+      const { result } = renderHook(() => useTopicCreationStore());
+
+      act(() => {
+        result.current.setCreating('Biología');
+        result.current.setJob('Biología', 'job1');
+        result.current.updateProgress('Biología', 45);
+      });
+
+      expect(result.current.creatingTopics[0].progress).toBe(45);
+      expect(result.current.creatingTopics[0].jobId).toBe('job1');
+    });
+
+    it('conserva el jobId si se vuelve a marcar el mismo tópico', () => {
+      const { result } = renderHook(() => useTopicCreationStore());
+
+      act(() => {
+        result.current.setCreating('Biología');
+        result.current.setJob('Biología', 'job1');
+        result.current.updateProgress('Biología', 30);
+        result.current.setCreating('Biología');
+      });
+
+      expect(result.current.creatingTopics[0].jobId).toBe('job1');
+      expect(result.current.creatingTopics[0].progress).toBe(30);
+      expect(result.current.creatingTopics).toHaveLength(1);
+    });
+
+    it('ignora nombres desconocidos', () => {
+      const { result } = renderHook(() => useTopicCreationStore());
+
+      act(() => {
+        result.current.setJob('Inexistente', 'job1');
+        result.current.updateProgress('Inexistente', 10);
+      });
+
+      expect(result.current.creatingTopics).toHaveLength(0);
+    });
+  });
+
   describe('setRefreshCallback', () => {
     it('sets the refresh callback function', () => {
       const mockCallback = jest.fn().mockResolvedValue(undefined);

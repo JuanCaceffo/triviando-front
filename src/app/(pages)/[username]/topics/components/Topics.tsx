@@ -5,31 +5,40 @@ import NewTopicCard from './NewTopicCard';
 import TopicCardLoader from './TopicCardLoader';
 import TopicCard from '@/app/components/topic-card';
 import { ITopic } from '../types';
-
-interface CreatingTopic {
-  name: string;
-  timestamp: number;
-}
+import type { CreatingTopic } from '@/app/stores/topicCreationStore';
 
 interface TopicsProps {
   topics: ITopic[];
   creatingTopics: CreatingTopic[];
   onGenerateTopic: (name: string) => Promise<void>;
+  onGenerateFromFile: (name: string, file: File) => Promise<void> | void;
 }
 
-const Topics = ({ topics, creatingTopics, onGenerateTopic }: TopicsProps) => {
+const Topics = ({
+  topics,
+  creatingTopics,
+  onGenerateTopic,
+  onGenerateFromFile,
+}: TopicsProps) => {
   return (
     <AnimatedList
       className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
       staggerDelay={0.1}
     >
       <AnimatedContainer key={'new-topic'} animation="slideUp" delay={0}>
-        <NewTopicCard onGenerateTopic={onGenerateTopic} />
+        <NewTopicCard
+          onGenerateTopic={onGenerateTopic}
+          onGenerateFromFile={onGenerateFromFile}
+        />
       </AnimatedContainer>
 
       {/* Render creating topics */}
       {creatingTopics.map((creatingTopic) => (
-        <TopicCardLoader key={`creating-${creatingTopic.name}`} name={creatingTopic.name} />
+        <TopicCardLoader
+          key={`creating-${creatingTopic.name}`}
+          name={creatingTopic.name}
+          progress={creatingTopic.progress}
+        />
       ))}
 
       {topics.map((topic, index) => (

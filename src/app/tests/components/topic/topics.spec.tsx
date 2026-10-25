@@ -56,13 +56,15 @@ describe('Topics component', () => {
   });
 
   it('renders initial topics', () => {
-    render(<Topics topics={mockTopics} creatingTopics={[]} onGenerateTopic={jest.fn()} />);
+    render(<Topics topics={mockTopics} creatingTopics={[]} onGenerateTopic={jest.fn()}
+        onGenerateFromFile={jest.fn()} />);
     expect(screen.getByText('Math')).toBeInTheDocument();
     expect(screen.getByText('Science')).toBeInTheDocument();
   });
 
   it('renders NewTopicCard', () => {
-    render(<Topics topics={mockTopics} creatingTopics={[]} onGenerateTopic={jest.fn()} />);
+    render(<Topics topics={mockTopics} creatingTopics={[]} onGenerateTopic={jest.fn()}
+        onGenerateFromFile={jest.fn()} />);
     expect(screen.getByTestId('new-topic-card')).toBeInTheDocument();
   });
 
@@ -72,6 +74,7 @@ describe('Topics component', () => {
         topics={mockTopics}
         creatingTopics={mockCreatingTopics}
         onGenerateTopic={jest.fn()}
+        onGenerateFromFile={jest.fn()}
       />,
     );
     expect(screen.getByTestId('topic-card-loader')).toHaveTextContent('LoaderTopic');
@@ -92,6 +95,7 @@ describe('Topics component', () => {
         topics={mockTopics}
         creatingTopics={filteredCreatingTopics}
         onGenerateTopic={jest.fn()}
+        onGenerateFromFile={jest.fn()}
       />,
     );
     expect(screen.queryByTestId('topic-card-loader')).not.toBeInTheDocument();
@@ -124,6 +128,7 @@ describe('Topics component', () => {
         topics={mockTopics}
         creatingTopics={multipleCreatingTopics}
         onGenerateTopic={jest.fn()}
+        onGenerateFromFile={jest.fn()}
       />,
     );
     expect(screen.getByText('LoaderTopic1')).toBeInTheDocument();
@@ -141,7 +146,14 @@ describe('Topics component', () => {
       }
     };
 
-    render(<Topics topics={mockTopics} creatingTopics={[]} onGenerateTopic={onGenerateTopic} />);
+    render(
+      <Topics
+        topics={mockTopics}
+        creatingTopics={[]}
+        onGenerateTopic={onGenerateTopic}
+        onGenerateFromFile={jest.fn()}
+      />,
+    );
     fireEvent.click(screen.getByTestId('new-topic-card'));
 
     await waitFor(() => expect(handleError).toHaveBeenCalled());
@@ -149,7 +161,8 @@ describe('Topics component', () => {
 
   it('syncs topics when props change', () => {
     const { rerender } = render(
-      <Topics topics={mockTopics} creatingTopics={[]} onGenerateTopic={jest.fn()} />,
+      <Topics topics={mockTopics} creatingTopics={[]} onGenerateTopic={jest.fn()}
+        onGenerateFromFile={jest.fn()} />,
     );
     expect(screen.getByText('Math')).toBeInTheDocument();
     rerender(
@@ -157,6 +170,7 @@ describe('Topics component', () => {
         topics={[{ name: 'History', icon: '📜', color: '#ccc', questionsCount: 1 }]}
         creatingTopics={[]}
         onGenerateTopic={jest.fn()}
+        onGenerateFromFile={jest.fn()}
       />,
     );
     expect(screen.getByText('History')).toBeInTheDocument();

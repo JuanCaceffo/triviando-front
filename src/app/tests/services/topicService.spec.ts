@@ -43,6 +43,45 @@ describe('TopicService', () => {
     });
   });
 
+  describe('generateTopicFromFile', () => {
+    it('debe enviar el topic y el archivo como FormData', async () => {
+      const mockData = { jobId: 'job1', topic: 'biologia', status: 'PENDING', progress: 0 };
+      (topicService as any).axiosService.post = jest.fn().mockResolvedValue({ data: mockData });
+      const file = new File(['contenido'], 'apunte.txt', { type: 'text/plain' });
+
+      const result = await topicService.generateTopicFromFile('biologia', file);
+
+      expect((topicService as any).axiosService.post).toHaveBeenCalledTimes(1);
+      const [url, formData] = (topicService as any).axiosService.post.mock.calls[0];
+      expect(url).toBe('/preguntas/document/generate');
+      expect(formData).toBeInstanceOf(FormData);
+      expect(formData.get('topic')).toBe('biologia');
+      expect(formData.get('file')).toBe(file);
+      expect(result).toEqual(mockData);
+    });
+  });
+
+  describe('getGenerationJob', () => {
+    it('debe consultar el estado del job por id', async () => {
+      const mockData = {
+        jobId: 'job1',
+        topic: 'biologia',
+        status: 'COMPLETED',
+        progress: 100,
+        result: [],
+        error: null,
+      };
+      (topicService as any).axiosService.get = jest.fn().mockResolvedValue({ data: mockData });
+
+      const result = await topicService.getGenerationJob('job1');
+
+      expect((topicService as any).axiosService.get).toHaveBeenCalledWith(
+        '/preguntas/document/jobs/job1',
+      );
+      expect(result).toEqual(mockData);
+    });
+  });
+
   describe('error handling', () => {
     it('should throw if getTopics fails', async () => {
       (topicService as any).axiosService.get = jest

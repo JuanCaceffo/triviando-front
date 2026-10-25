@@ -3,20 +3,31 @@ import { render, fireEvent, screen } from '@testing-library/react';
 
 describe('NewTopicCard', () => {
   const onGenerateTopic = jest.fn().mockResolvedValue(undefined);
+  const onGenerateFromFile = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders card content', () => {
-    render(<NewTopicCard onGenerateTopic={onGenerateTopic} />);
+    render(
+      <NewTopicCard
+        onGenerateTopic={onGenerateTopic}
+        onGenerateFromFile={onGenerateFromFile}
+      />,
+    );
     expect(screen.getByText('Crear Nuevo Tema')).toBeInTheDocument();
     expect(screen.getByText('Personaliza tus preguntas')).toBeInTheDocument();
     expect(screen.getByText('Generado con IA')).toBeInTheDocument();
   });
 
   it('opens modal on card click', () => {
-    render(<NewTopicCard onGenerateTopic={onGenerateTopic} />);
+    render(
+      <NewTopicCard
+        onGenerateTopic={onGenerateTopic}
+        onGenerateFromFile={onGenerateFromFile}
+      />,
+    );
     const card =
       screen.getByText('Crear Nuevo Tema').closest('[role="button"]') ||
       screen.getByText('Crear Nuevo Tema').closest('.cursor-pointer');
@@ -32,7 +43,12 @@ describe('NewTopicCard', () => {
   });
 
   it('closes modal when onClose is called', () => {
-    render(<NewTopicCard onGenerateTopic={onGenerateTopic} />);
+    render(
+      <NewTopicCard
+        onGenerateTopic={onGenerateTopic}
+        onGenerateFromFile={onGenerateFromFile}
+      />,
+    );
     // Open the modal first
     const card =
       screen.getByText('Crear Nuevo Tema').closest('[role="button"]') ||
@@ -49,7 +65,12 @@ describe('NewTopicCard', () => {
   });
 
   it('does not open modal if card is not clicked', () => {
-    render(<NewTopicCard onGenerateTopic={onGenerateTopic} />);
+    render(
+      <NewTopicCard
+        onGenerateTopic={onGenerateTopic}
+        onGenerateFromFile={onGenerateFromFile}
+      />,
+    );
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
   });
 });

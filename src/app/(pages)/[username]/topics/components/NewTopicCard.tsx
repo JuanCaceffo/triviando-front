@@ -7,9 +7,10 @@ import { useState } from 'react';
 
 interface NewTopicCardProps {
   onGenerateTopic: (name: string) => Promise<void>;
+  onGenerateFromFile: (name: string, file: File) => Promise<void> | void;
 }
 
-const NewTopicCard = ({ onGenerateTopic }: NewTopicCardProps) => {
+const NewTopicCard = ({ onGenerateTopic, onGenerateFromFile }: NewTopicCardProps) => {
   const [open, setOpen] = useState(false);
   const cardAnimation = useCardAnimation();
 
@@ -39,6 +40,7 @@ const NewTopicCard = ({ onGenerateTopic }: NewTopicCardProps) => {
         isOpen={open}
         onClose={() => setOpen(false)}
         onGenerateTopic={({ name }) => onGenerateTopic(name)}
+        onGenerateFromFile={onGenerateFromFile}
       />
     </AnimatedContainer>
   );

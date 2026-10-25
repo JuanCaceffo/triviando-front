@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface CreatingTopic {
+export interface CreatingTopic {
   name: string;
   timestamp: number;
+  jobId?: string;
+  progress?: number;
 }
 
 interface TopicCreationStore {
@@ -12,6 +14,8 @@ interface TopicCreationStore {
   removeCreating: (name: string) => void;
   isCreating: (name: string) => boolean;
   clearOldCreations: () => void;
+  setJob: (name: string, jobId: string) => void;
+  updateProgress: (name: string, progress: number) => void;
   refreshCallback: (() => Promise<void>) | null;
   setRefreshCallback: (callback: () => Promise<void>) => void;
 }
@@ -23,11 +27,35 @@ export const useTopicCreationStore = create<TopicCreationStore>()(
       refreshCallback: null,
 
       setCreating: (name: string) => {
+        set((state) => {
+          const previous = state.creatingTopics.find((topic) => topic.name === name);
+          return {
+            creatingTopics: [
+              ...state.creatingTopics.filter((t) => t.name !== name),
+              {
+                name,
+                timestamp: Date.now(),
+                jobId: previous?.jobId,
+                progress: previous?.progress,
+              },
+            ],
+          };
+        });
+      },
+
+      setJob: (name: string, jobId: string) => {
         set((state) => ({
-          creatingTopics: [
-            ...state.creatingTopics.filter((t) => t.name !== name),
-            { name, timestamp: Date.now() },
-          ],
+          creatingTopics: state.creatingTopics.map((topic) =>
+            topic.name === name ? { ...topic, jobId, progress: 0 } : topic,
+          ),
+        }));
+      },
+
+      updateProgress: (name: string, progress: number) => {
+        set((state) => ({
+          creatingTopics: state.creatingTopics.map((topic) =>
+            topic.name === name ? { ...topic, progress } : topic,
+          ),
         }));
       },
 

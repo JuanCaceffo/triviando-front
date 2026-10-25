@@ -5,6 +5,7 @@ import CreateTopicModal from '@/app/(pages)/[username]/topics/components/NewTopi
 describe('CreateTopicModal', () => {
   const onClose = jest.fn();
   const onGenerateTopic = jest.fn();
+  const onGenerateFromFile = jest.fn();
 
   const setup = (props = {}) =>
     render(
@@ -12,6 +13,7 @@ describe('CreateTopicModal', () => {
         isOpen={true}
         onClose={onClose}
         onGenerateTopic={onGenerateTopic}
+        onGenerateFromFile={onGenerateFromFile}
         {...props}
       />,
     );
@@ -55,6 +57,22 @@ describe('CreateTopicModal', () => {
   it('calls onClose when Cancelar is clicked', () => {
     setup();
     fireEvent.click(screen.getByText('Cancelar'));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('permite crear un tema a partir de un archivo', () => {
+    setup();
+
+    fireEvent.mouseDown(screen.getByRole('tab', { name: 'Desde archivo' }));
+
+    const file = new File(['contenido del archivo'], 'apunte.txt', { type: 'text/plain' });
+    fireEvent.change(screen.getByLabelText('Nombre del tema'), {
+      target: { value: 'Biología' },
+    });
+    fireEvent.change(screen.getByLabelText('Archivo'), { target: { files: [file] } });
+    fireEvent.click(screen.getByText('Generar desde archivo'));
+
+    expect(onGenerateFromFile).toHaveBeenCalledWith('Biología', file);
     expect(onClose).toHaveBeenCalled();
   });
 });
