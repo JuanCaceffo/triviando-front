@@ -67,8 +67,11 @@ export default function FileUploadTab({ onSubmit, onCancel }: FileUploadTabProps
       setErrors(nextErrors);
       return;
     }
+    if (!file) {
+      return;
+    }
 
-    onSubmit(topicName.trim(), file as File);
+    onSubmit(topicName.trim(), file);
   };
 
   return (

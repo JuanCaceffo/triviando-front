@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import { parserTopics } from './utils/helpers';
 import Header from './components/Header';
 import Filter from './components/Filter';
@@ -10,11 +9,13 @@ import { topicService } from '@/app/services/topicService';
 import { ITopic, ITopicDTO } from './types';
 import TopicsSkeleton from './components/TopicsSkeleton';
 import { StreakModal } from '@/app/components/modals/StreakModal';
-import { handleError } from '@/app/utils/errorHandler';
 import { useCurrentUserId } from '@/app/utils/auth';
 import { toast } from 'react-toastify';
 import { useTopicCreationStore } from '@/app/stores/topicCreationStore';
+import type { CreatingTopic } from '@/app/stores/topicCreationStore';
 import { waitForGenerationJob } from './utils/pollGenerationJob';
+import { findTopic, hasTopic, toTopic } from './utils/topicMapper';
+import { notifyApiError } from './utils/apiError';
 
 export default function TopicsPage() {
   const userId = useCurrentUserId();
@@ -31,17 +32,25 @@ export default function TopicsPage() {
     updateProgress,
   } = useTopicCreationStore();
   const resumedJobs = useRef(false);
-  // Función para refrescar los tópicos
+
   const refreshTopics = async (): Promise<void> => {
     try {
       if (!userId) return;
-      const topics = await topicService.getTopics({ id: userId });
-      const parsedTopics = parserTopics(topics);
-      setTopics(parsedTopics);
+      const fetchedTopics = await topicService.getTopics({ id: userId });
+      setTopics(parserTopics(fetchedTopics));
     } catch (error) {
-      handleError(error);
+      notifyApiError(error, 'No se pudieron cargar los tópicos.');
     }
   };
+
+  const removeConfirmedTopics = (currentTopics: ITopic[]) => {
+    creatingTopics.forEach((creatingTopic) => {
+      if (hasTopic(currentTopics, creatingTopic.name)) {
+        removeCreating(creatingTopic.name);
+      }
+    });
+  };
+
   useEffect(() => {
     const getTopics = async () => {
       try {
@@ -49,21 +58,11 @@ export default function TopicsPage() {
         clearOldCreations();
 
         if (!userId) return;
-        const topics = await topicService.getTopics({ id: userId });
-        const parsedTopics = parserTopics(topics);
-        setTopics(parsedTopics);
-
-        // Verificar si algún tópico que se estaba creando ya existe
-        creatingTopics.forEach((creatingTopic) => {
-          const exists = parsedTopics.some(
-            (t) => t.name.toLowerCase() === creatingTopic.name.toLowerCase(),
-          );
-          if (exists) {
-            removeCreating(creatingTopic.name);
-          }
-        });
+        const fetchedTopics = parserTopics(await topicService.getTopics({ id: userId }));
+        setTopics(fetchedTopics);
+        removeConfirmedTopics(fetchedTopics);
       } catch (error) {
-        handleError(error);
+        notifyApiError(error, 'No se pudieron cargar los tópicos.');
       } finally {
         setLoading(false);
       }
@@ -74,61 +73,45 @@ export default function TopicsPage() {
 
     getTopics();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]); // Depender del userId
+  }, [userId]);
+
   useEffect(() => {
     const checkForCompletedTopics = async () => {
-      if (creatingTopics.length > 0 && !loading) {
-        // Refrescar la lista para ver si algún tópico se completó
-        try {
-          await refreshTopics();
+      if (creatingTopics.length === 0 || loading) return;
 
-          // Verificar si algún tópico que se estaba creando ya existe
-          creatingTopics.forEach((creatingTopic) => {
-            const exists = topics.some(
-              (t) => t.name.toLowerCase() === creatingTopic.name.toLowerCase(),
-            );
-            if (exists) {
-              removeCreating(creatingTopic.name);
-            }
-          });
-        } catch (error) {
-          // Error en la verificación automática no debe ser mostrado al usuario
-          console.warn('Error al verificar tópicos completados:', error);
-        }
+      // Refrescar la lista para ver si algún tópico se completó
+      try {
+        await refreshTopics();
+        removeConfirmedTopics(topics);
+      } catch (error) {
+        // Error en la verificación automática no debe ser mostrado al usuario
+        console.warn('Error al verificar tópicos completados:', error);
       }
     };
 
-    // Solo ejecutar si no estamos cargando y hay tópicos creándose
     if (!loading && creatingTopics.length > 0) {
       checkForCompletedTopics();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [creatingTopics.length, loading]); // Usar solo length para evitar loops
+  }, [creatingTopics.length, loading]);
+
+  const addTopicIfMissing = (dto: ITopicDTO) => {
+    const newTopic = toTopic(dto);
+    setTopics((previous) =>
+      hasTopic(previous, newTopic.name) ? previous : [...previous, newTopic],
+    );
+    toast.success(`Tópico "${newTopic.name}" creado exitosamente.`);
+  };
 
   const applyGeneratedTopic = (name: string, result: ITopicDTO[] | null) => {
-    const created =
-      result?.find((topic) => topic.topic.toLowerCase() === name.toLowerCase()) ?? result?.[0];
+    const created = findTopic(result, name);
 
-    if (!created) {
+    if (created) {
+      addTopicIfMissing(created);
+    } else {
       toast.error('No se pudo obtener el tópico generado. Intenta nuevamente.');
-      removeCreating(name);
-      return;
     }
 
-    const newTopic: ITopic = {
-      name: created.topic,
-      icon: created.emoji,
-      color: '#06b6d4',
-      questionsCount: created.size,
-    };
-
-    setTopics((prev) =>
-      prev.some((topic) => topic.name.toLowerCase() === newTopic.name.toLowerCase())
-        ? prev
-        : [...prev, newTopic],
-    );
-
-    toast.success(`Tópico "${created.topic}" creado exitosamente.`);
     removeCreating(name);
   };
 
@@ -140,15 +123,7 @@ export default function TopicsPage() {
       });
       applyGeneratedTopic(name, job.result);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        handleError(error);
-      } else {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : 'No se pudieron generar las preguntas a partir del archivo.',
-        );
-      }
+      notifyApiError(error, 'No se pudieron generar las preguntas a partir del archivo.');
       removeCreating(name);
     }
   };
@@ -158,9 +133,14 @@ export default function TopicsPage() {
     if (!userId || resumedJobs.current) return;
     resumedJobs.current = true;
 
-    const pending = useTopicCreationStore.getState().creatingTopics.filter((entry) => entry.jobId);
+    const pending = useTopicCreationStore
+      .getState()
+      .creatingTopics.filter(
+        (entry): entry is CreatingTopic & { jobId: string } => Boolean(entry.jobId),
+      );
+
     pending.forEach((entry) => {
-      watchGenerationJob(entry.name, entry.jobId as string);
+      watchGenerationJob(entry.name, entry.jobId);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
@@ -171,35 +151,18 @@ export default function TopicsPage() {
       return;
     }
 
-    // Usar el store de Zustand para manejar el estado de creación
     setCreating(name);
 
     try {
-      const response = await topicService.generateTopic(name);
-      const created = (response as ITopicDTO[]).find((t: ITopicDTO) => t.topic === name);
-      if (created) {
-        const newTopic: ITopic = {
-          name: created.topic,
-          icon: created.emoji,
-          color: '#06b6d4',
-          questionsCount: created.size,
-        };
-
-        // Actualizar la lista local primero
-        setTopics((prev) =>
-          prev.some((t) => t.name === newTopic.name) ? prev : [...prev, newTopic],
-        );
-
-        toast.success(`Tópico "${created.topic}" creado exitosamente.`);
-
-        // Remover del estado de creación (esto automáticamente ejecuta refresh)
-        removeCreating(name);
-      } else {
+      const created = findTopic(await topicService.generateTopic(name), name);
+      if (!created) {
         toast.error('Ocurrió un error al crear el tópico. Intenta nuevamente.');
-        removeCreating(name);
+      } else {
+        addTopicIfMissing(created);
       }
+      removeCreating(name);
     } catch (error) {
-      handleError(error);
+      notifyApiError(error, 'Ocurrió un error al crear el tópico.');
       removeCreating(name);
     }
   };
@@ -217,13 +180,7 @@ export default function TopicsPage() {
       setJob(name, created.jobId);
       await watchGenerationJob(name, created.jobId);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        handleError(error);
-      } else {
-        toast.error(
-          error instanceof Error ? error.message : 'No se pudo procesar el archivo seleccionado.',
-        );
-      }
+      notifyApiError(error, 'No se pudo procesar el archivo seleccionado.');
       removeCreating(name);
     }
   };
@@ -234,8 +191,7 @@ export default function TopicsPage() {
 
   // Obtener tópicos que se están creando y no existen aún
   const currentlyCreating = creatingTopics.filter(
-    (creatingTopic) =>
-      !topics.some((t) => t.name.toLowerCase() === creatingTopic.name.toLowerCase()),
+    (creatingTopic) => !hasTopic(topics, creatingTopic.name),
   );
 
   return (

@@ -2,15 +2,16 @@ import { BaseService } from './baseService';
 import {
   IGenerationJobCreatedDTO,
   IGenerationJobDTO,
+  ITopicDTO,
 } from '../(pages)/[username]/topics/types';
 
 class TopicService extends BaseService {
-  getTopics = async ({ id }: { id: number }) => {
+  getTopics = async ({ id }: { id: number }): Promise<ITopicDTO[]> => {
     const { data } = await this.axiosService.get(`/preguntas/topicos/${id}`);
     return data;
   };
 
-  generateTopic = async (name: string) => {
+  generateTopic = async (name: string): Promise<ITopicDTO[]> => {
     const { data } = await this.axiosService.post('/preguntas/generate', {
       topic: name,
       promptType: 'topicPrompter',
