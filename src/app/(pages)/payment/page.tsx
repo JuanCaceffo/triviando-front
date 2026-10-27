@@ -19,13 +19,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/ca
 import { Button } from '@/app/components/ui/button';
 import { useCurrentUser } from '@/app/utils/auth';
 import { suscriptionService } from '@/app/services/suscriptionService';
+import type { ISubscriptionPlan } from '@/app/services/suscriptionService';
 import { userService } from '@/app/services/userService';
 import type { IUserData } from '@/app/services/userService';
+import { formatPlanPrice } from './utils/formatPlanPrice';
 
 export default function Subscription() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userDetails, setUserDetails] = useState<IUserData | null>(null);
+  const [plan, setPlan] = useState<ISubscriptionPlan | null>(null);
   const user = useCurrentUser();
 
   // Cargar los datos completos del usuario al montar el componente
@@ -44,6 +47,25 @@ export default function Subscription() {
 
     loadUserDetails();
   }, [user?.id]);
+
+  // Cargar el precio y la moneda del plan desde el backend
+  useEffect(() => {
+    let cancelled = false;
+
+    suscriptionService
+      .getPlan()
+      .then((planData) => {
+        if (!cancelled) setPlan(planData);
+      })
+      .catch((error) => {
+        console.error('Error al cargar el plan Premium:', error);
+        if (!cancelled) setError('No se pudo cargar el precio del plan. Recargá la página.');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Si no hay usuario cargado, mostrar un mensaje o redirigir
   if (!user || !userDetails) {
@@ -296,10 +318,15 @@ export default function Subscription() {
                 </div>
                 <CardTitle className="text-2xl mb-2">Plan Premium</CardTitle>
                 <div className="text-4xl font-bold mb-2">
-                  $9.99
-                  <span className="text-lg font-normal opacity-90">/mes</span>
+                  {plan ? (
+                    formatPlanPrice(plan.price, plan.currency)
+                  ) : error ? (
+                    '—'
+                  ) : (
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                  )}
                 </div>
-                <p className="opacity-90">Facturación mensual</p>
+                <p className="opacity-90">Pago único</p>
               </CardHeader>
 
               <CardContent className="p-8">
@@ -331,7 +358,7 @@ export default function Subscription() {
 
                 {/* Información del usuario */}
                 <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-gray-600 mb-1">Suscripción para:</p>
+                  <p className="text-sm text-gray-600 mb-1">Acceso Premium para:</p>
                   <p className="font-medium text-gray-800">
                     {userDetails?.name && userDetails?.lastName
                       ? `${userDetails.name} ${userDetails.lastName}`
@@ -374,7 +401,7 @@ export default function Subscription() {
                   <Button
                     className="w-full h-14 text-lg bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white shadow-lg"
                     onClick={handleSubscribe}
-                    disabled={isLoading}
+                    disabled={isLoading || !plan}
                   >
                     {isLoading ? (
                       <>
@@ -384,7 +411,7 @@ export default function Subscription() {
                     ) : (
                       <>
                         <CreditCard className="mr-2 h-5 w-5" />
-                        Suscribirse Ahora
+                        Comprar Premium
                       </>
                     )}
                   </Button>
@@ -397,10 +424,10 @@ export default function Subscription() {
                     Pago seguro con Mercado Pago
                   </p>
                   <p className="text-xs text-gray-500">
-                    Puedes cancelar tu suscripción en cualquier momento
+                    El pago es único: no se renueva automáticamente
                   </p>
                   <p className="text-xs text-gray-500">
-                    Al suscribirte aceptas nuestros términos y condiciones
+                    Al comprar aceptas nuestros términos y condiciones
                   </p>
                 </div>
               </CardContent>

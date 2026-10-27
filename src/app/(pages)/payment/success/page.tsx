@@ -158,7 +158,7 @@ function SubscriptionSuccessContent() {
                 transition={{ delay: 0.4 }}
                 className="text-3xl font-bold mb-2"
               >
-                ¡Suscripción Activada!
+                ¡Premium Activado!
               </motion.h1>
 
               <motion.p
