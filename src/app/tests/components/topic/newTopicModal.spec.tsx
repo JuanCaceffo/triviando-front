@@ -11,6 +11,7 @@ describe('CreateTopicModal', () => {
     render(
       <CreateTopicModal
         isOpen={true}
+        isPremium={true}
         onClose={onClose}
         onGenerateTopic={onGenerateTopic}
         onGenerateFromFile={onGenerateFromFile}
@@ -74,5 +75,19 @@ describe('CreateTopicModal', () => {
 
     expect(onGenerateFromFile).toHaveBeenCalledWith('Biología', file);
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('muestra el upsell Premium en lugar del formulario para usuarios FREE', () => {
+    setup({ isPremium: false });
+
+    fireEvent.mouseDown(screen.getByRole('tab', { name: /desde archivo/i }));
+
+    expect(screen.getByText(/exclusiva del plan premium/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /actualizar a premium/i })).toHaveAttribute(
+      'href',
+      '/payment',
+    );
+    expect(screen.queryByLabelText('Archivo')).not.toBeInTheDocument();
+    expect(screen.queryByText('Generar desde archivo')).not.toBeInTheDocument();
   });
 });

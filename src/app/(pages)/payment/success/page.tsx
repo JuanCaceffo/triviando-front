@@ -8,12 +8,38 @@ import { CheckCircle2, Crown, Sparkles, ArrowRight, Home } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Card, CardContent } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
+import { useCurrentUser } from '@/app/utils/auth';
+import { userService } from '@/app/services/userService';
+import { useUserStore } from '@/app/stores/userStore';
 
 function SubscriptionSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { username } = useParams<{ username: string }>();
   const [countdown, setCountdown] = useState(10);
+  const user = useCurrentUser();
+  const currentUsername = username || user?.username;
+
+  // Sincronizar la cuenta del store con el backend tras activar Premium
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let cancelled = false;
+    userService
+      .getUserById(user.id)
+      .then((userData) => {
+        if (!cancelled) {
+          useUserStore.getState().updateUser({ account: userData.account });
+        }
+      })
+      .catch(() => {
+        // Si falla, el perfil se actualizará en la próxima carga
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   // Obtener parámetros de la URL (enviados por Mercado Pago)
   const paymentId = searchParams.get('payment_id');
@@ -58,7 +84,7 @@ function SubscriptionSuccessContent() {
   // Contador para redirección automática
   useEffect(() => {
     if (countdown <= 0) {
-      router.push(`/${username}/topics`);
+      router.push(currentUsername ? `/${currentUsername}/topics` : '/');
       return;
     }
 
@@ -67,15 +93,11 @@ function SubscriptionSuccessContent() {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [countdown, router, username]);
+  }, [countdown, router, currentUsername]);
 
   const benefits = [
-    'Preguntas ilimitadas generadas por IA',
-    'Temas personalizados sin restricciones',
-    'Explicaciones detalladas para cada respuesta',
-    'Estadísticas avanzadas de progreso',
-    'Sin anuncios publicitarios',
-    'Soporte prioritario',
+    'Temario generado desde tus archivos (PDF, DOCX, TXT o MD)',
+    'Preguntas creadas por IA a partir de tu material',
   ];
 
   return (
@@ -136,7 +158,7 @@ function SubscriptionSuccessContent() {
                 transition={{ delay: 0.4 }}
                 className="text-3xl font-bold mb-2"
               >
-                ¡Suscripción Activada!
+                ¡Premium Activado!
               </motion.h1>
 
               <motion.p
@@ -163,8 +185,8 @@ function SubscriptionSuccessContent() {
                 </div>
 
                 <p className="text-gray-600 mb-6">
-                  Tu pago ha sido procesado exitosamente. Ahora tienes acceso completo a todas las
-                  funciones premium.
+                  Tu pago ha sido procesado exitosamente. Ahora tenés acceso a la generación de
+                  temas desde archivos.
                 </p>
 
                 {/* Información del pago */}
@@ -219,7 +241,7 @@ function SubscriptionSuccessContent() {
               >
                 <Button
                   className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white h-12"
-                  onClick={() => router.push(`/${username}/topics`)}
+                  onClick={() => router.push(currentUsername ? `/${currentUsername}/topics` : '/')}
                 >
                   <ArrowRight className="mr-2 h-5 w-5" />
                   Comenzar a Jugar
@@ -228,7 +250,7 @@ function SubscriptionSuccessContent() {
                 <Button
                   variant="outline"
                   className="flex-1 border-emerald-200 hover:bg-emerald-50 h-12 bg-transparent"
-                  onClick={() => router.push(`/${username}/profile`)}
+                  onClick={() => router.push(currentUsername ? `/${currentUsername}/profile` : '/')}
                 >
                   <Home className="mr-2 h-5 w-5" />
                   Ver Mi Perfil

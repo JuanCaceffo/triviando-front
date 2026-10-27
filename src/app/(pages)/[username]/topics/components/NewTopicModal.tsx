@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Save } from 'lucide-react';
+import { Crown, Save } from 'lucide-react';
 import {
   Dialog,
   DialogClose,
@@ -16,9 +16,11 @@ import { Input } from '@/app/components/ui/input';
 import { Button } from '@/app/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs';
 import FileUploadTab from './FileUploadTab';
+import PremiumFileUpsell from './PremiumFileUpsell';
 
 interface CreateTopicModalProps {
   isOpen: boolean;
+  isPremium: boolean;
   onClose: () => void;
   onGenerateTopic: (topic: { name: string }) => void;
   onGenerateFromFile: (name: string, file: File) => void;
@@ -26,6 +28,7 @@ interface CreateTopicModalProps {
 
 export default function CreateTopicModal({
   isOpen,
+  isPremium,
   onClose,
   onGenerateTopic,
   onGenerateFromFile,
@@ -88,7 +91,13 @@ export default function CreateTopicModal({
               value="file"
               className="data-[state=active]:border-cyan-500 data-[state=active]:text-cyan-700"
             >
+              {!isPremium && <Crown className="mr-1 h-4 w-4 text-amber-500" />}
               Desde archivo
+              {!isPremium && (
+                <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700">
+                  Premium
+                </span>
+              )}
             </TabsTrigger>
           </TabsList>
 
@@ -137,7 +146,11 @@ export default function CreateTopicModal({
           </TabsContent>
 
           <TabsContent value="file">
-            <FileUploadTab onSubmit={handleGenerateFromFile} onCancel={handleClose} />
+            {isPremium ? (
+              <FileUploadTab onSubmit={handleGenerateFromFile} onCancel={handleClose} />
+            ) : (
+              <PremiumFileUpsell onCancel={handleClose} />
+            )}
           </TabsContent>
         </Tabs>
       </DialogContent>

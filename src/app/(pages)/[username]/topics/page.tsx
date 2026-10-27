@@ -9,7 +9,8 @@ import { topicService } from '@/app/services/topicService';
 import { ITopic, ITopicDTO } from './types';
 import TopicsSkeleton from './components/TopicsSkeleton';
 import { StreakModal } from '@/app/components/modals/StreakModal';
-import { useCurrentUserId } from '@/app/utils/auth';
+import { useCurrentUserId, useCurrentUser } from '@/app/utils/auth';
+import { AccountOptions } from '@/app/domain/User';
 import { toast } from 'react-toastify';
 import { useTopicCreationStore } from '@/app/stores/topicCreationStore';
 import type { CreatingTopic } from '@/app/stores/topicCreationStore';
@@ -19,6 +20,8 @@ import { notifyApiError } from './utils/apiError';
 
 export default function TopicsPage() {
   const userId = useCurrentUserId();
+  const user = useCurrentUser();
+  const isPremium = user?.account === AccountOptions.PREMIUM;
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [topics, setTopics] = useState<ITopic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -170,6 +173,13 @@ export default function TopicsPage() {
   const handleCreateTopicFromFile = async (name: string, file: File) => {
     if (!userId) {
       toast.error('Error: Usuario no autenticado');
+      return;
+    }
+
+    if (!isPremium) {
+      toast.error(
+        'La creación de temas desde archivos es exclusiva del plan Premium. Actualizá tu plan para usarla.',
+      );
       return;
     }
 

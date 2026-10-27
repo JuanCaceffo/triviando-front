@@ -4,6 +4,7 @@ import AnimatedContainer, { useCardAnimation } from '@/app/components/AnimatedCo
 import { Plus, Sparkles } from 'lucide-react';
 import NewTopicModal from './NewTopicModal';
 import { useState } from 'react';
+import { useAccountBackground } from '@/app/hooks/useAccountBackground';
 
 interface NewTopicCardProps {
   onGenerateTopic: (name: string) => Promise<void>;
@@ -13,6 +14,7 @@ interface NewTopicCardProps {
 const NewTopicCard = ({ onGenerateTopic, onGenerateFromFile }: NewTopicCardProps) => {
   const [open, setOpen] = useState(false);
   const cardAnimation = useCardAnimation();
+  const { isPremium } = useAccountBackground();
 
   return (
     <AnimatedContainer style={{ height: '100%' }} animation="fade" {...cardAnimation}>
@@ -38,6 +40,7 @@ const NewTopicCard = ({ onGenerateTopic, onGenerateFromFile }: NewTopicCardProps
       </Card>
       <NewTopicModal
         isOpen={open}
+        isPremium={isPremium}
         onClose={() => setOpen(false)}
         onGenerateTopic={({ name }) => onGenerateTopic(name)}
         onGenerateFromFile={onGenerateFromFile}

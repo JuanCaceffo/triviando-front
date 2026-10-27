@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/app/components/ui/button';
 import { CloudinaryAvatar } from '@/app/components/CloudinaryAvatar';
-import { Trophy, LogOut, User, ChevronDown } from 'lucide-react';
+import { Trophy, LogOut, User, ChevronDown, Crown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedContainer from '@/app/components/AnimatedContainer';
 import { loginService } from '@/app/services/loginService';
@@ -12,7 +12,7 @@ import { useCurrentUser } from '@/app/utils/auth';
 import { useInitializeUser } from '@/app/hooks/useInitializeUser';
 import { useUserAvatar } from '@/app/hooks/useUserAvatar';
 import Image from 'next/image';
-// import AccountBadge from '@/app/components/AccountBadge';
+import AccountBadge from '@/app/components/AccountBadge';
 
 const Header = () => {
   const router = useRouter();
@@ -82,20 +82,20 @@ const Header = () => {
     router.push(`/${username}/leaderboard`);
   };
 
-  // const handleSubscription = () => {
-  //   setIsOpen(false);
-  //   router.push('/payment');
-  // };
+  const handleSubscription = () => {
+    setIsOpen(false);
+    router.push('/payment');
+  };
 
   return (
     <header className="p-4 flex flex-row-reverse items-center gap-4 justify-between">
       <div className="flex items-center gap-4 justify-between md:justify-end w-auto md:w-full">
-        {/* <AccountBadge
+        <AccountBadge
           account={user?.account ?? 'FREE'}
           size="sm"
           showIcon={true}
           className="shrink-0"
-        /> */}
+        />
         <div className="flex items-center gap-4 justify-end">
           {/* Botón de ranking */}
           <AnimatedContainer animation="fade">
@@ -158,13 +158,13 @@ const Header = () => {
                       <User className="mr-3 h-4 w-4 text-teal-500" />
                       Perfil
                     </button>
-                    {/* <button
+                    <button
                       onClick={handleSubscription}
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                       <Crown className="mr-3 h-4 w-4 text-cyan-500" />
                       Suscripción
-                    </button> */}
+                    </button>
                   </div>
 
                   {/* Separador */}

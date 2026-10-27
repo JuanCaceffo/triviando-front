@@ -68,7 +68,7 @@ class LoginService extends BaseService {
       lastName: userData.lastName,
       username: userData.username,
       email: userData.email,
-      account: userInfo.account,
+      account: userData.account ?? userInfo.account,
       token: token,
       avatar: userData.avatar,
     };
@@ -141,6 +141,7 @@ class LoginService extends BaseService {
           name: userData.name,
           lastName: userData.lastName,
           email: userData.email,
+          account: userData.account,
           avatar: userData.avatar,
         };
         useUserStore.getState().setUser(fullUser);

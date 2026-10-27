@@ -60,13 +60,13 @@ export default function TermsPage() {
               <li>Violar los derechos de propiedad intelectual de terceros</li>
             </ul>
 
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">5. Suscripciones Premium</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">5. Acceso Premium</h2>
             <p className="text-gray-700 mb-4">
-              Las suscripciones premium están sujetas a los siguientes términos:
+              El acceso Premium es un pago único y está sujeto a los siguientes términos:
             </p>
             <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-              <li>Los pagos se procesan mensualmente de forma automática</li>
-              <li>Puede cancelar su suscripción en cualquier momento</li>
+              <li>El pago se procesa una única vez y no se renueva automáticamente</li>
+              <li>El acceso Premium no requiere cancelación</li>
               <li>No se proporcionan reembolsos por períodos parciales</li>
               <li>Los precios pueden cambiar con previo aviso de 30 días</li>
             </ul>
