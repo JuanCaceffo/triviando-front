@@ -52,9 +52,10 @@ describe('LoginService', () => {
     lastName: 'User',
     username: 'testuser',
     email: 'test@example.com',
+    account: 'PREMIUM',
   };
   const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test';
-  const mockTokenInfo = { id: 1, fullname: 'Test User', username: 'testuser', account: 'premium' };
+  const mockTokenInfo = { id: 1, fullname: 'Test User', username: 'testuser', account: 'FREE' };
   const credentials: LoginCredentials = { username: 'testuser', password: '1234' };
 
   const mockUserStore = {
@@ -86,6 +87,18 @@ describe('LoginService', () => {
     expect(mockUserStore.setUser).toHaveBeenCalled();
     expect(result.id).toBe(1);
     expect(result.username).toBe('testuser');
+    expect(result.account).toBe('PREMIUM');
+  });
+
+  it('should hydrate the account from the backend in getUsuarioActual', async () => {
+    (Cookies.get as jest.Mock).mockReturnValue(mockToken);
+
+    loginService.getUsuarioActual();
+    await Promise.resolve();
+
+    expect(mockUserStore.setUser).toHaveBeenLastCalledWith(
+      expect.objectContaining({ account: 'PREMIUM' }),
+    );
   });
 
   it('should remove token cookie on logout', () => {

@@ -7,8 +7,7 @@ import {
   Crown,
   Check,
   Sparkles,
-  Brain,
-  Zap,
+  FileText,
   Shield,
   ArrowLeft,
   CreditCard,
@@ -61,60 +60,48 @@ export default function Subscription() {
   // Características del plan premium
   const premiumFeatures = [
     {
-      icon: Brain,
-      title: 'Preguntas Ilimitadas con IA',
-      description: 'Genera tantas preguntas como quieras sobre cualquier tema',
+      icon: FileText,
+      title: 'Temas desde tus archivos',
+      description:
+        'Subí un PDF, DOCX, TXT o MD y generá un tema completo a partir de tus apuntes.',
     },
     {
       icon: Sparkles,
-      title: 'Temas Personalizados',
-      description: 'Crea temas únicos y específicos para tus intereses',
-    },
-    {
-      icon: Zap,
-      title: 'Explicaciones Detalladas',
-      description: 'Aprende con explicaciones generadas por IA para cada respuesta',
-    },
-    {
-      icon: Shield,
-      title: 'Sin Anuncios',
-      description: 'Disfruta de una experiencia completamente libre de publicidad',
+      title: 'Preguntas a partir de tu material',
+      description: 'La IA usa el contenido de tu documento para crear el quiz del tema.',
     },
   ];
 
   // Datos para la tabla de comparación
   const comparisonFeatures = [
     {
-      feature: 'Preguntas por día',
-      free: '10',
-      premium: 'Ilimitadas',
-    },
-    {
-      feature: 'Temas personalizados',
-      free: '1',
+      feature: 'Crear temas con IA',
+      free: 'Ilimitados',
       premium: 'Ilimitados',
     },
     {
-      feature: 'Explicaciones IA',
+      feature: 'Preguntas generadas',
+      free: 'Ilimitadas',
+      premium: 'Ilimitadas',
+    },
+    {
+      feature: 'Crear temas desde archivo',
       free: false,
       premium: true,
     },
     {
-      feature: 'Sin anuncios',
+      feature: 'PDF, DOCX, TXT o MD',
       free: false,
       premium: true,
     },
     {
-      feature: 'Estadísticas avanzadas',
-      free: false,
-      premium: true,
-    },
-    {
-      feature: 'Soporte prioritario',
-      free: false,
-      premium: true,
+      feature: 'Tamaño máximo por archivo',
+      free: '—',
+      premium: '10 MB',
     },
   ];
+
+  const isPremium = userDetails.account === 'PREMIUM';
 
   const handleSubscribe = async () => {
     if (!user?.id || !userDetails?.email) {
@@ -193,7 +180,7 @@ export default function Subscription() {
             transition={{ delay: 0.3 }}
             className="text-4xl md:text-5xl font-bold text-white mb-4"
           >
-            Desbloquea Todo el Potencial
+            Convertí tus apuntes en quizzes
           </motion.h1>
 
           <motion.p
@@ -202,8 +189,8 @@ export default function Subscription() {
             transition={{ delay: 0.4 }}
             className="text-xl text-white/90 max-w-2xl mx-auto"
           >
-            Accede a preguntas ilimitadas generadas por IA, temas personalizados y una experiencia
-            sin anuncios
+            Generá temas completos a partir de tus archivos. Los temas y preguntas ilimitados ya
+            están incluidos en el plan Gratis; Premium suma la creación desde documentos.
           </motion.p>
         </motion.div>
 
@@ -317,15 +304,11 @@ export default function Subscription() {
 
               <CardContent className="p-8">
                 {/* Lista de beneficios */}
-                <div className="space-y-4 mb-8">
+                <div className="space-y-4 mb-6">
                   {[
-                    'Preguntas ilimitadas con IA',
-                    'Temas personalizados sin límite',
-                    'Explicaciones detalladas',
-                    'Estadísticas avanzadas',
-                    'Sin anuncios publicitarios',
-                    'Soporte prioritario',
-                    'Nuevas funciones primero',
+                    'Creá temas desde tus apuntes',
+                    'PDF, DOCX, TXT o MD de hasta 10 MB',
+                    'La IA genera las preguntas a partir de tu material',
                   ].map((benefit, index) => (
                     <motion.div
                       key={index}
@@ -338,6 +321,12 @@ export default function Subscription() {
                       <span className="text-gray-700">{benefit}</span>
                     </motion.div>
                   ))}
+                </div>
+
+                <div className="mb-6 rounded-lg border border-cyan-200 bg-cyan-50 p-4">
+                  <p className="text-sm text-cyan-800">
+                    Los temas y preguntas ilimitados ya están incluidos en el plan Gratis.
+                  </p>
                 </div>
 
                 {/* Información del usuario */}
@@ -364,24 +353,42 @@ export default function Subscription() {
                   </motion.div>
                 )}
 
-                {/* Botón de suscripción */}
-                <Button
-                  className="w-full h-14 text-lg bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white shadow-lg"
-                  onClick={handleSubscribe}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Procesando...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="mr-2 h-5 w-5" />
-                      Suscribirse Ahora
-                    </>
-                  )}
-                </Button>
+                {/* Botón de suscripción o estado Premium */}
+                {isPremium ? (
+                  <div className="rounded-lg border border-teal-200 bg-teal-50 p-4 text-center">
+                    <div className="mb-2 flex items-center justify-center gap-2">
+                      <Crown className="h-5 w-5 text-teal-600" />
+                      <span className="font-medium text-teal-800">Ya sos Premium</span>
+                    </div>
+                    <p className="mb-4 text-sm text-teal-700">
+                      Tenés acceso a la generación de temas desde archivos.
+                    </p>
+                    <Button
+                      asChild
+                      className="w-full h-12 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white"
+                    >
+                      <Link href={`/${user?.username}/topics`}>Ir a mis temas</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    className="w-full h-14 text-lg bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white shadow-lg"
+                    onClick={handleSubscribe}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Procesando...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="mr-2 h-5 w-5" />
+                        Suscribirse Ahora
+                      </>
+                    )}
+                  </Button>
+                )}
 
                 {/* Información adicional */}
                 <div className="mt-6 text-center space-y-2">
@@ -394,17 +401,6 @@ export default function Subscription() {
                   </p>
                   <p className="text-xs text-gray-500">
                     Al suscribirte aceptas nuestros términos y condiciones
-                  </p>
-                </div>
-
-                {/* Garantía */}
-                <div className="mt-6 bg-teal-50 border border-teal-200 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Check className="h-5 w-5 text-teal-600" />
-                    <span className="font-medium text-teal-800">Garantía de 7 días</span>
-                  </div>
-                  <p className="text-sm text-teal-700">
-                    Si no estás satisfecho, te devolvemos tu dinero sin preguntas
                   </p>
                 </div>
               </CardContent>
@@ -420,11 +416,10 @@ export default function Subscription() {
           className="mt-16 text-center"
         >
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20">
-            <h3 className="text-2xl font-bold text-white mb-4">¿Por qué elegir Premium?</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">Estudiá con tu propio material</h3>
             <p className="text-white/90 text-lg max-w-3xl mx-auto">
-              Únete a miles de usuarios que ya disfrutan de una experiencia de aprendizaje
-              personalizada y sin límites. Con trivIAndo Premium, cada pregunta es una oportunidad
-              de aprender algo nuevo.
+              Subí tus apuntes y convertí cada documento en un tema con preguntas generadas por IA.
+              Sin cargar contenido a mano y sin límites de temas ni preguntas.
             </p>
           </div>
         </motion.div>
