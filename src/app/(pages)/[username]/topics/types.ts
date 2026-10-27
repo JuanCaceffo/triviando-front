@@ -14,14 +14,14 @@ export interface ITopic {
 export type GenerationJobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 
 export interface IGenerationJobCreatedDTO {
-  jobId: string;
+  jobId: number;
   topic: string;
   status: GenerationJobStatus;
   progress: number;
 }
 
 export interface IGenerationJobDTO {
-  jobId: string;
+  jobId: number;
   topic: string;
   status: GenerationJobStatus;
   progress: number;

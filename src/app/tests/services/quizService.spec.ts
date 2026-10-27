@@ -45,7 +45,7 @@ describe('quizService', () => {
     it('should call axiosService.post with correct body', async () => {
       const body = {
         user: { id: 1 },
-        questionId: 'q1',
+        questionId: 1,
         optionSelected: 'A' as any,
         millisecondsSpent: 1000,
       };

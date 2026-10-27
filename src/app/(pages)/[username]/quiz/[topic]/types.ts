@@ -2,19 +2,19 @@ export type LetterType = 'A' | 'B' | 'C' | 'D';
 type DifficultyType = 'LOW' | 'MEDIUM' | 'HIGH';
 
 interface IOptionDTO {
-  id: string;
+  id: number;
   letter: LetterType;
   text: string;
 }
 
 interface IOption {
-  id: string;
+  id: number;
   letter: LetterType;
   text: string;
 }
 
 export interface IQuizDTO {
-  id: string;
+  id: number;
   topico: string;
   enunciado: string;
   options: IOptionDTO[];
@@ -23,7 +23,7 @@ export interface IQuizDTO {
 }
 
 export interface IQuiz {
-  id: string;
+  id: number;
   question: string;
   options: IOption[];
   explanation: string;
@@ -37,7 +37,7 @@ export interface QuestionFeedbackProps {
 }
 
 export interface IFeedbackDTO {
-  questionId: string;
+  questionId: number;
   feedbackType: string;
   description?: string;
 }

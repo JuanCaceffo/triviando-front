@@ -4,7 +4,7 @@ export const GENERATION_POLL_INTERVAL_MS = 2500;
 export const GENERATION_TIMEOUT_MS = 5 * 60 * 1000;
 
 export interface GenerationJobPollingOptions {
-  fetchJob: (jobId: string) => Promise<IGenerationJobDTO>;
+  fetchJob: (jobId: number) => Promise<IGenerationJobDTO>;
   onProgress?: (progress: number) => void;
   intervalMs?: number;
   timeoutMs?: number;
@@ -19,7 +19,7 @@ const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(r
  * Las dependencias de tiempo son inyectables para poder testearlo sin timers.
  */
 export async function waitForGenerationJob(
-  jobId: string,
+  jobId: number,
   options: GenerationJobPollingOptions,
 ): Promise<IGenerationJobDTO> {
   const {

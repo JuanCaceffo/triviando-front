@@ -9,7 +9,7 @@ const buildJob = (
   progress = 0,
   error: string | null = null,
 ): IGenerationJobDTO => ({
-  jobId: 'job1',
+  jobId: 1,
   topic: 'Biología',
   status,
   progress,
@@ -34,7 +34,7 @@ const runPolling = (
     ...overrides,
   };
 
-  return { fetchJob, promise: waitForGenerationJob('job1', options) };
+  return { fetchJob, promise: waitForGenerationJob(1, options) };
 };
 
 describe('waitForGenerationJob', () => {

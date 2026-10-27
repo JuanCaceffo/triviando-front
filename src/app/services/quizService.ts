@@ -4,7 +4,7 @@ import { useUserStore } from '../stores/userStore';
 
 interface IAnswerRequestDTO {
   user: { id: number };
-  questionId: string;
+  questionId: number;
   optionSelected: LetterType;
   millisecondsSpent: number;
 }

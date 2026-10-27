@@ -30,7 +30,7 @@ class TopicService extends BaseService {
     return data;
   };
 
-  getGenerationJob = async (jobId: string): Promise<IGenerationJobDTO> => {
+  getGenerationJob = async (jobId: number): Promise<IGenerationJobDTO> => {
     const { data } = await this.axiosService.get(`/preguntas/document/jobs/${jobId}`);
     return data;
   };

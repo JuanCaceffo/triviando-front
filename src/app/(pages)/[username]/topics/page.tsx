@@ -118,7 +118,7 @@ export default function TopicsPage() {
     removeCreating(name);
   };
 
-  const watchGenerationJob = async (name: string, jobId: string) => {
+  const watchGenerationJob = async (name: string, jobId: number) => {
     try {
       const job = await waitForGenerationJob(jobId, {
         fetchJob: topicService.getGenerationJob,
@@ -139,7 +139,8 @@ export default function TopicsPage() {
     const pending = useTopicCreationStore
       .getState()
       .creatingTopics.filter(
-        (entry): entry is CreatingTopic & { jobId: string } => Boolean(entry.jobId),
+        (entry): entry is CreatingTopic & { jobId: number } =>
+          typeof entry.jobId === 'number' && Number.isFinite(entry.jobId),
       );
 
     pending.forEach((entry) => {

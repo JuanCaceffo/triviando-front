@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware';
 export interface CreatingTopic {
   name: string;
   timestamp: number;
-  jobId?: string;
+  jobId?: number;
   progress?: number;
 }
 
@@ -14,7 +14,7 @@ interface TopicCreationStore {
   removeCreating: (name: string) => void;
   isCreating: (name: string) => boolean;
   clearOldCreations: () => void;
-  setJob: (name: string, jobId: string) => void;
+  setJob: (name: string, jobId: number) => void;
   updateProgress: (name: string, progress: number) => void;
   refreshCallback: (() => Promise<void>) | null;
   setRefreshCallback: (callback: () => Promise<void>) => void;
@@ -43,7 +43,7 @@ export const useTopicCreationStore = create<TopicCreationStore>()(
         });
       },
 
-      setJob: (name: string, jobId: string) => {
+      setJob: (name: string, jobId: number) => {
         set((state) => ({
           creatingTopics: state.creatingTopics.map((topic) =>
             topic.name === name ? { ...topic, jobId, progress: 0 } : topic,

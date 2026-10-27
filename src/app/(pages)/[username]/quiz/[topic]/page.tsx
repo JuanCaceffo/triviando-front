@@ -77,7 +77,7 @@ const QuizPage = () => {
   const currentQuestion = questions[currentQuestionIndex];
   const progress = questions.length ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
 
-  const handleOptionSelect = async (quizId: string, option: LetterType) => {
+  const handleOptionSelect = async (quizId: number, option: LetterType) => {
     // Prevenir múltiples submissions
     if (isSubmittingAnswer || isCorrect !== null) return;
 

@@ -335,10 +335,10 @@ describe('topicCreationStore', () => {
 
       act(() => {
         result.current.setCreating('Biología');
-        result.current.setJob('Biología', 'job1');
+        result.current.setJob('Biología', 1);
       });
 
-      expect(result.current.creatingTopics[0].jobId).toBe('job1');
+      expect(result.current.creatingTopics[0].jobId).toBe(1);
       expect(result.current.creatingTopics[0].progress).toBe(0);
     });
 
@@ -347,12 +347,12 @@ describe('topicCreationStore', () => {
 
       act(() => {
         result.current.setCreating('Biología');
-        result.current.setJob('Biología', 'job1');
+        result.current.setJob('Biología', 1);
         result.current.updateProgress('Biología', 45);
       });
 
       expect(result.current.creatingTopics[0].progress).toBe(45);
-      expect(result.current.creatingTopics[0].jobId).toBe('job1');
+      expect(result.current.creatingTopics[0].jobId).toBe(1);
     });
 
     it('conserva el jobId si se vuelve a marcar el mismo tópico', () => {
@@ -360,12 +360,12 @@ describe('topicCreationStore', () => {
 
       act(() => {
         result.current.setCreating('Biología');
-        result.current.setJob('Biología', 'job1');
+        result.current.setJob('Biología', 1);
         result.current.updateProgress('Biología', 30);
         result.current.setCreating('Biología');
       });
 
-      expect(result.current.creatingTopics[0].jobId).toBe('job1');
+      expect(result.current.creatingTopics[0].jobId).toBe(1);
       expect(result.current.creatingTopics[0].progress).toBe(30);
       expect(result.current.creatingTopics).toHaveLength(1);
     });
@@ -374,7 +374,7 @@ describe('topicCreationStore', () => {
       const { result } = renderHook(() => useTopicCreationStore());
 
       act(() => {
-        result.current.setJob('Inexistente', 'job1');
+        result.current.setJob('Inexistente', 1);
         result.current.updateProgress('Inexistente', 10);
       });
 

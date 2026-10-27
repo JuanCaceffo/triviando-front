@@ -3,13 +3,13 @@ import { IQuiz } from '@/app/(pages)/[username]/quiz/[topic]/types';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 const mockQuestion: IQuiz = {
-  id: 'idquestion1',
+  id: 1,
   question: '¿Cuál es la capital de Francia?',
   options: [
-    { id: 'id1', letter: 'A', text: 'Berlín' },
-    { id: 'id2', letter: 'B', text: 'Madrid' },
-    { id: 'id3', letter: 'C', text: 'París' },
-    { id: 'id4', letter: 'D', text: 'Londres' },
+    { id: 1, letter: 'A', text: 'Berlín' },
+    { id: 2, letter: 'B', text: 'Madrid' },
+    { id: 3, letter: 'C', text: 'París' },
+    { id: 4, letter: 'D', text: 'Londres' },
   ],
   explanation: 'París es la capital porque...',
   difficulty: 'MEDIUM',
@@ -17,13 +17,13 @@ const mockQuestion: IQuiz = {
 
 // Use a unique question for the last test to avoid duplicate keys
 const mockQuestion2: IQuiz = {
-  id: 'idquestion2',
+  id: 2,
   question: '¿Cuál es la capital de Alemania?',
   options: [
-    { id: 'id5', letter: 'A', text: 'Berlín' },
-    { id: 'id6', letter: 'B', text: 'Madrid' },
-    { id: 'id7', letter: 'C', text: 'París' },
-    { id: 'id8', letter: 'D', text: 'Londres' },
+    { id: 5, letter: 'A', text: 'Berlín' },
+    { id: 6, letter: 'B', text: 'Madrid' },
+    { id: 7, letter: 'C', text: 'París' },
+    { id: 8, letter: 'D', text: 'Londres' },
   ],
   explanation: 'Berlín es la capital de Alemania.',
   difficulty: 'LOW',
