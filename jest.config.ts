@@ -36,6 +36,7 @@ const customJestConfig = {
     '!src/**/cloudinaryAvatarService.ts',
     '!src/**/cloudinaryServerService.ts',
     '!src/**/api/**/route.ts',
+    '!src/app/tests/**',
   ],
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',

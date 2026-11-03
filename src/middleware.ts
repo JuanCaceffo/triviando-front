@@ -38,7 +38,7 @@ export function middleware(request: NextRequest) {
   const isPublicRoute = publicRoutes.some((route) => url.pathname.startsWith(route));
 
   // Rutas protegidas que requieren autenticación pero no siguen el patrón /{username}/...
-  const specialProtectedRoutes = ['/payment'];
+  const specialProtectedRoutes = ['/payment', '/room'];
   const isSpecialProtectedRoute = specialProtectedRoutes.some((route) =>
     url.pathname.startsWith(route),
   );
@@ -51,9 +51,17 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   // Si es una ruta protegida especial, verificar solo autenticación
+  const loginRedirect = () => {
+    const loginUrl = new URL('/login', request.url);
+    if (url.pathname.startsWith('/room')) {
+      loginUrl.searchParams.set('next', `${url.pathname}${url.search}`);
+    }
+    return NextResponse.redirect(loginUrl);
+  };
+
   if (isSpecialProtectedRoute) {
     if (!tokenCookie) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return loginRedirect();
     }
 
     try {
@@ -61,14 +69,14 @@ export function middleware(request: NextRequest) {
 
       // Verificar si el token ha expirado
       if (isTokenExpired(token)) {
-        return NextResponse.redirect(new URL('/login', request.url));
+        return loginRedirect();
       }
 
       // Token válido, permitir acceso
       return NextResponse.next();
     } catch (error) {
       console.error('Error parsing JWT token:', error);
-      return NextResponse.redirect(new URL('/login', request.url));
+      return loginRedirect();
     }
   }
 
