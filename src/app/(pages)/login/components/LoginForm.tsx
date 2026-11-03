@@ -18,12 +18,25 @@ import { handleError } from '@/app/utils/errorHandler';
 import { toast } from 'react-toastify';
 import Logo from '@/app/components/logo';
 import { APP_TEXTS } from '@/utils/constants';
+import {
+  getNextFromLocation,
+  resolvePostLoginPath,
+} from '@/app/utils/auth/sanitizeNext';
 
 export default function LoginPage() {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [isFetching, setIsFetching] = useState(false);
   const [isGoogleReady, setIsGoogleReady] = useState(false);
+  const [nextPath, setNextPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    setNextPath(getNextFromLocation());
+  }, []);
+
+  const redirectAfterLogin = (username: string) => {
+    window.location.href = resolvePostLoginPath(username, getNextFromLocation());
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +49,7 @@ export default function LoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Forzar recarga para asegurar sincronización
-      window.location.href = `/${username}/topics`;
+      redirectAfterLogin(username);
     } catch (error) {
       handleError(error);
     } finally {
@@ -69,7 +82,7 @@ export default function LoginPage() {
           try {
             const { username } = await loginService.loginWithGoogle(credential);
             toast.success('Inicio de sesión exitoso');
-            window.location.href = `/${username}/topics`;
+            redirectAfterLogin(username);
           } catch (error) {
             handleError(error);
           } finally {
@@ -193,7 +206,11 @@ export default function LoginPage() {
               <div className="text-center text-sm cursor-default text-gray-700">
                 ¿No tienes una cuenta?{' '}
                 <Link
-                  href="/register"
+                  href={
+                    nextPath
+                      ? `/register?next=${encodeURIComponent(nextPath)}`
+                      : '/register'
+                  }
                   className="text-cyan-600 hover:text-cyan-800 font-medium transition-colors"
                 >
                   Regístrate

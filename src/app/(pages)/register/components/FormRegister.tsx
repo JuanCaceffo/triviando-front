@@ -15,6 +15,10 @@ import { formRegisterSchema } from '@/app/schemas/formRegisterSchema';
 import { userService } from '@/app/services/userService';
 import { toast } from 'react-toastify';
 import { useState } from 'react';
+import {
+  getNextFromLocation,
+  resolvePostLoginPath,
+} from '@/app/utils/auth/sanitizeNext';
 
 type FormData = z.infer<typeof formRegisterSchema>;
 
@@ -36,8 +40,8 @@ const FormRegister = () => {
       // Usar userService.createUser que ahora maneja cookies, tokens y contexto automáticamente
       const user = await userService.createUser({ ...data });
       toast.success('Registro exitoso');
-      // Redirigir usando el username del usuario registrado
-      router.push(`/${user.username}/topics`);
+      // Redirigir usando el username del usuario registrado, o a la sala de invitación
+      router.push(resolvePostLoginPath(user.username, getNextFromLocation()));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       toast.error(e.message ?? 'Falló el registro');

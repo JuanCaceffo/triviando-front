@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { parserTopics } from './utils/helpers';
 import Header from './components/Header';
 import Filter from './components/Filter';
+import RoomActiveBanner from './components/RoomActiveBanner';
 import Topics from './components/Topics';
 import { topicService } from '@/app/services/topicService';
 import { ITopic, ITopicDTO } from './types';
@@ -210,6 +211,7 @@ export default function TopicsPage() {
       <Header />
       <main className="p-4 max-w-4xl mx-auto">
         <StreakModal />
+        <RoomActiveBanner />
         <Filter searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         {loading ? (
           <TopicsSkeleton />

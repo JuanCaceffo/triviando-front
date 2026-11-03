@@ -2,6 +2,7 @@
 
 import AnimatedContainer, { AnimatedList } from '@/app/components/AnimatedContainer';
 import NewTopicCard from './NewTopicCard';
+import NewRoomCard from './NewRoomCard';
 import TopicCardLoader from './TopicCardLoader';
 import TopicCard from '@/app/components/topic-card';
 import { ITopic } from '../types';
@@ -30,6 +31,10 @@ const Topics = ({
           onGenerateTopic={onGenerateTopic}
           onGenerateFromFile={onGenerateFromFile}
         />
+      </AnimatedContainer>
+
+      <AnimatedContainer key={'new-room'} animation="slideUp" delay={0.1}>
+        <NewRoomCard />
       </AnimatedContainer>
 
       {/* Render creating topics */}
