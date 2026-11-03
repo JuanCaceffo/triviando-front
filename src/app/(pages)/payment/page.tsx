@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   CreditCard,
   Loader2,
+  Users,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -92,6 +93,18 @@ export default function Subscription() {
       title: 'Preguntas a partir de tu material',
       description: 'La IA usa el contenido de tu documento para crear el quiz del tema.',
     },
+    {
+      icon: Users,
+      title: 'Salas de trivia en vivo',
+      description:
+        'Creá una sala y jugá con hasta 40 personas. Compartí el código o el link y respondan todos al mismo tiempo.',
+    },
+    {
+      icon: Sparkles,
+      title: 'Preguntas nuevas para cada partida',
+      description:
+        'La IA genera 10 preguntas nuevas por sala, desde un tema o un archivo, sin tocar tu ranking ni tus estadísticas.',
+    },
   ];
 
   // Datos para la tabla de comparación
@@ -120,6 +133,26 @@ export default function Subscription() {
       feature: 'Tamaño máximo por archivo',
       free: '—',
       premium: '10 MB',
+    },
+    {
+      feature: 'Crear salas de trivia en vivo',
+      free: false,
+      premium: true,
+    },
+    {
+      feature: 'Jugadores por sala',
+      free: '—',
+      premium: 'Hasta 40',
+    },
+    {
+      feature: 'Preguntas por sala',
+      free: '—',
+      premium: '10 nuevas',
+    },
+    {
+      feature: 'Unirse a una sala con código',
+      free: true,
+      premium: true,
     },
   ];
 
@@ -202,7 +235,7 @@ export default function Subscription() {
             transition={{ delay: 0.3 }}
             className="text-4xl md:text-5xl font-bold text-white mb-4"
           >
-            Convertí tus apuntes en quizzes
+            Convertí tus apuntes en quizzes y jugá en vivo
           </motion.h1>
 
           <motion.p
@@ -211,8 +244,9 @@ export default function Subscription() {
             transition={{ delay: 0.4 }}
             className="text-xl text-white/90 max-w-2xl mx-auto"
           >
-            Generá temas completos a partir de tus archivos. Los temas y preguntas ilimitados ya
-            están incluidos en el plan Gratis; Premium suma la creación desde documentos.
+            Generá temas completos a partir de tus archivos y organizá salas de trivia para hasta
+            40 personas. Los temas y preguntas ilimitados ya están incluidos en el plan Gratis;
+            Premium suma la creación desde documentos y salas en vivo.
           </motion.p>
         </motion.div>
 
@@ -336,6 +370,9 @@ export default function Subscription() {
                     'Creá temas desde tus apuntes',
                     'PDF, DOCX, TXT o MD de hasta 10 MB',
                     'La IA genera las preguntas a partir de tu material',
+                    'Creá salas en vivo para hasta 40 jugadores',
+                    'Compartí un código o link para invitar',
+                    'Preguntas nuevas y puntaje independiente en cada partida',
                   ].map((benefit, index) => (
                     <motion.div
                       key={index}
@@ -388,7 +425,7 @@ export default function Subscription() {
                       <span className="font-medium text-teal-800">Ya sos Premium</span>
                     </div>
                     <p className="mb-4 text-sm text-teal-700">
-                      Tenés acceso a la generación de temas desde archivos.
+                      Tenés acceso a la generación desde archivos y a la creación de salas en vivo.
                     </p>
                     <Button
                       asChild
@@ -443,10 +480,13 @@ export default function Subscription() {
           className="mt-16 text-center"
         >
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20">
-            <h3 className="text-2xl font-bold text-white mb-4">Estudiá con tu propio material</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">
+              Estudiá con tu propio material y jugá en grupo
+            </h3>
             <p className="text-white/90 text-lg max-w-3xl mx-auto">
               Subí tus apuntes y convertí cada documento en un tema con preguntas generadas por IA.
-              Sin cargar contenido a mano y sin límites de temas ni preguntas.
+              Además, creá salas en vivo para jugar con hasta 40 personas, desde un tema o un
+              archivo.
             </p>
           </div>
         </motion.div>
