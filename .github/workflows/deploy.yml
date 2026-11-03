@@ -17,9 +17,6 @@ env:
   # App "triviando-frontend" en Dokploy
   DOKPLOY_APP_ID: w9t5yeYhHtQb59ZWeQakt
   DOKPLOY_URL: ${{ vars.DOKPLOY_URL || 'https://dokploy-hook.triviando.com.ar' }}
-  NEXT_PUBLIC_API_URL_CLIENT: https://triviando.com.ar
-  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: d3zqmqkh
-  NEXT_PUBLIC_GOOGLE_CLIENT_ID: 133030480767-qrlibhiv5b0b3ff2blh2babm0dphbrk7.apps.googleusercontent.com
 
 jobs:
   deploy:
@@ -64,9 +61,9 @@ jobs:
           platforms: linux/amd64
           tags: ${{ env.IMAGE }}:${{ github.sha }}
           build-args: |
-            NEXT_PUBLIC_API_URL_CLIENT=${{ env.NEXT_PUBLIC_API_URL_CLIENT }}
-            NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
-            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ env.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+            NEXT_PUBLIC_API_URL_CLIENT=https://triviando.com.ar
+            NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=d3zqmqkh
+            NEXT_PUBLIC_GOOGLE_CLIENT_ID=133030480767-qrlibhiv5b0b3ff2blh2babm0dphbrk7.apps.googleusercontent.com
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
