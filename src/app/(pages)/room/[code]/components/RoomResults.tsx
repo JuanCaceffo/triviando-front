@@ -73,7 +73,12 @@ export default function RoomResults({ room, onBack, onLeave }: RoomResultsProps)
           />
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" onClick={onLeave}>
+            <Button
+              type="button"
+              variant="outline"
+              className="border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50 hover:text-red-700"
+              onClick={onLeave}
+            >
               Salir de la sala
             </Button>
             <Button type="button" onClick={onBack}>
