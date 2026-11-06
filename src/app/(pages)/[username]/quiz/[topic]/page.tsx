@@ -2,12 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, CheckCircle2, BookOpen, X, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, BookOpen } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { Progress } from '@/app/components/ui/progress';
-import { RadioGroup, RadioGroupItem } from '@/app/components/ui/radio-group';
-import { Label } from '@/app/components/ui/label';
 import { AnimatePresence } from 'framer-motion';
 import AnimatedContainer from '@/app/components/AnimatedContainer';
 import confetti from 'canvas-confetti';
@@ -19,6 +16,8 @@ import { quizService } from '@/app/services/quizService';
 import { IFeedbackDTO, IQuiz, LetterType } from './types';
 import { useCurrentUserId } from '@/app/utils/auth';
 import Timer, { TimerHandle } from '../../../../components/Timer';
+import QuizQuestionHeader from '@/app/components/quiz/QuizQuestionHeader';
+import QuizOptionButton, { QuizOptionState } from '@/app/components/quiz/QuizOptionButton';
 import { playSound } from '@/app/utils/playSound';
 import QuestionFeedback from './components/QuestionFeedback';
 import { toast } from 'react-toastify';
@@ -49,6 +48,7 @@ const QuizPage = () => {
   } | null>(null);
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [submittingOption, setSubmittingOption] = useState<LetterType | null>(null);
+  const [timerSeconds, setTimerSeconds] = useState(50);
   const confettiRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<TimerHandle>(null);
 
@@ -75,7 +75,6 @@ const QuizPage = () => {
   }, [decodeURITopic]);
 
   const currentQuestion = questions[currentQuestionIndex];
-  const progress = questions.length ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
 
   const handleOptionSelect = async (quizId: number, option: LetterType) => {
     // Prevenir múltiples submissions
@@ -240,18 +239,14 @@ const QuizPage = () => {
 
   if (isLoading) return <WaitingModal topic={decodeURITopic ?? 'General'} />;
 
-  const getAnswerStyles = (isCorrect: boolean | null, option: string) => {
+  const optionState = (letter: LetterType): QuizOptionState => {
     if (isSubmittingAnswer) {
-      // Durante submission, solo la opción seleccionada se ve diferente
-      if (option === submittingOption) {
-        return 'border-blue-400 bg-blue-50';
-      }
-      return 'opacity-50 cursor-not-allowed';
+      // Durante el envío, solo la opción seleccionada se ve activa
+      return letter === submittingOption ? 'selected' : 'muted';
     }
 
-    if (isCorrect === null) return;
-    if (isCorrect && option === selectedOption) return 'border-green-500 bg-green-100';
-    if (!isCorrect && option === selectedOption) return 'border-red-500 bg-red-100';
+    if (isCorrect === null || letter !== selectedOption) return 'idle';
+    return isCorrect ? 'correct' : 'incorrect';
   };
 
   if (!currentQuestion) return <ProblemModal />;
@@ -275,14 +270,12 @@ const QuizPage = () => {
           ref={confettiRef}
         >
           <CardHeader>
-            <Timer ref={timerRef} />
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">
-                Pregunta {currentQuestionIndex + 1} de {questions.length}
-              </span>
-              <span className="text-sm font-medium">{Math.round(progress)}%</span>
-            </div>
-            <Progress value={progress} className="h-2 bg-cyan-100" />
+            <QuizQuestionHeader
+              current={currentQuestionIndex + 1}
+              total={questions.length}
+              secondsLeft={timerSeconds}
+            />
+            <Timer ref={timerRef} onTick={(remainingSeconds) => setTimerSeconds(remainingSeconds)} />
           </CardHeader>
 
           <CardContent className="pt-6 overflow-hidden">
@@ -299,49 +292,29 @@ const QuizPage = () => {
                   opacity: { duration: 0.2 },
                 }}
               >
-                <CardTitle className="text-xl mb-6">{currentQuestion.question}</CardTitle>
+                <CardTitle className="mt-4 mb-6 text-xl leading-snug text-gray-900">
+                  {currentQuestion.question}
+                </CardTitle>
 
-                <RadioGroup value={selectedOption ?? ''} className="space-y-3">
-                  {currentQuestion.options.map(({ text, letter }, index: number) => (
+                <div className="space-y-3" role="radiogroup" aria-label="Opciones de respuesta">
+                  {currentQuestion.options.map(({ text, letter }) => (
                     <AnimatedContainer
                       key={`${currentQuestionIndex}-${letter}`}
-                      className="flex items-center"
                       animation="slideUp"
-                      delay={1 * 0.1}
+                      delay={0.1}
                     >
-                      <RadioGroupItem
-                        value={letter}
-                        id={`option-${index}`}
-                        onClick={() => handleOptionSelect(currentQuestion.id, letter)}
-                        className="peer sr-only"
+                      <QuizOptionButton
+                        letter={letter}
+                        text={text}
+                        state={optionState(letter)}
+                        checked={selectedOption === letter || submittingOption === letter}
+                        pending={isSubmittingAnswer && letter === submittingOption}
                         disabled={isCorrect !== null || isSubmittingAnswer}
+                        onSelect={() => handleOptionSelect(currentQuestion.id, letter)}
                       />
-                      <Label
-                        htmlFor={`option-${index}`}
-                        className={`flex flex-1 items-center justify-between rounded-md border-2 border-cyan-100 bg-white p-4 transition-all duration-200 ${
-                          isSubmittingAnswer && letter !== submittingOption
-                            ? 'cursor-not-allowed'
-                            : 'cursor-pointer'
-                        } ${getAnswerStyles(isCorrect, letter)}`}
-                      >
-                        <span className="flex-1">{text}</span>
-
-                        {/* Loader para la opción que está siendo enviada */}
-                        {isSubmittingAnswer && letter === submittingOption && (
-                          <Loader2 className="h-5 w-5 text-blue-500 ml-2 animate-spin" />
-                        )}
-
-                        {/* Íconos de resultado después de la respuesta */}
-                        {isCorrect && letter === selectedOption && !isSubmittingAnswer && (
-                          <CheckCircle2 className="h-5 w-5 text-green-500 ml-2" />
-                        )}
-                        {isCorrect === false &&
-                          letter === selectedOption &&
-                          !isSubmittingAnswer && <X className="h-5 w-5 text-red-500 ml-2" />}
-                      </Label>
                     </AnimatedContainer>
                   ))}
-                </RadioGroup>
+                </div>
 
                 {/* Botones que aparecen después de responder */}
                 {isCorrect !== null && (

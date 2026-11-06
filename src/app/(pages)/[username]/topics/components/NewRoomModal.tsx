@@ -28,10 +28,14 @@ interface NewRoomModalProps {
   onJoin: (code: string) => void;
 }
 
-const tabListClass = 'grid w-full grid-cols-2 bg-cyan-50/80 p-1';
+const tabListClass = 'grid w-full grid-cols-2';
 
-const tabTriggerClass =
-  'text-cyan-700/80 hover:text-cyan-800 data-[state=active]:border-cyan-400 data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 data-[state=active]:shadow-sm';
+const tabTriggerClass = 'data-[state=active]:border-cyan-500 data-[state=active]:text-cyan-700';
+
+const outlineButtonClass = 'border-cyan-200 hover:bg-cyan-50 text-cyan-700';
+
+const primaryButtonClass =
+  'bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white';
 
 export default function NewRoomModal({
   isOpen,
@@ -110,7 +114,7 @@ export default function NewRoomModal({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="create" className="mt-4">
+          <TabsContent value="create">
             {!isPremium ? (
               <PremiumRoomUpsell onCancel={close} />
             ) : (
@@ -147,11 +151,16 @@ export default function NewRoomModal({
                     </div>
                     <DialogFooter>
                       <DialogClose asChild>
-                        <Button type="button" variant="outline" onClick={close}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className={outlineButtonClass}
+                          onClick={close}
+                        >
                           Cancelar
                         </Button>
                       </DialogClose>
-                      <Button type="submit" loading={creating}>
+                      <Button type="submit" loading={creating} className={primaryButtonClass}>
                         <Save className="mr-2 h-4 w-4" />
                         Crear sala
                       </Button>
@@ -169,7 +178,7 @@ export default function NewRoomModal({
             )}
           </TabsContent>
 
-          <TabsContent value="join" className="mt-4">
+          <TabsContent value="join">
             <form onSubmit={handleJoin}>
               <div className="grid gap-4 py-4">
                 <Label htmlFor="room-code" className="text-cyan-700">
@@ -195,11 +204,16 @@ export default function NewRoomModal({
               </div>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="outline" onClick={close}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={outlineButtonClass}
+                    onClick={close}
+                  >
                     Cancelar
                   </Button>
                 </DialogClose>
-                <Button type="submit">
+                <Button type="submit" className={primaryButtonClass}>
                   <Play className="mr-2 h-4 w-4" />
                   Entrar a la sala
                 </Button>

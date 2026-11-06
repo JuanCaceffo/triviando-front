@@ -8,12 +8,20 @@ describe('Timer component', () => {
   it('should render the progress bar with 100% initial progress', () => {
     const { container } = render(<Timer />);
 
-    const indicator = container.querySelector('.transition-transform') as HTMLElement;
-    expect(indicator).toBeInTheDocument();
-    expect(indicator.style.transform).toBe('translateX(-0%)'); // 100% progreso
+    const bar = container.querySelector('[role="progressbar"]');
+    expect(bar).toBeInTheDocument();
+
+    const indicator = bar?.firstElementChild as HTMLElement;
+    expect(indicator.style.width).toBe('100%'); // 100% progreso
   });
 
-  const TimerWithRef = ({ refCallback }: { refCallback: (ref: TimerHandle) => void }) => {
+  const TimerWithRef = ({
+    refCallback,
+    onTick,
+  }: {
+    refCallback: (ref: TimerHandle) => void;
+    onTick?: (remainingSeconds: number, progress: number) => void;
+  }) => {
     const timerRef = useRef<TimerHandle>(null);
 
     useEffect(() => {
@@ -22,7 +30,7 @@ describe('Timer component', () => {
       }
     });
 
-    return <Timer ref={timerRef} />;
+    return <Timer ref={timerRef} onTick={onTick} />;
   };
 
   it('should start, progress, stop and get elapsed time correctly', async () => {
@@ -48,5 +56,29 @@ describe('Timer component', () => {
     const elapsed = ref!.getElapsedTime();
     expect(elapsed).toBeGreaterThanOrEqual(3000);
     expect(elapsed).toBeLessThan(3500);
+  });
+
+  it('should report the remaining seconds and progress on every tick', async () => {
+    const onTick = jest.fn();
+    let ref: TimerHandle | null = null;
+
+    render(<TimerWithRef refCallback={(r) => (ref = r)} onTick={onTick} />);
+    await act(async () => {});
+
+    act(() => {
+      ref!.start();
+    });
+
+    expect(onTick).toHaveBeenCalledWith(50, 100);
+
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    expect(onTick).toHaveBeenLastCalledWith(47, 94);
+
+    act(() => {
+      ref!.stop();
+    });
   });
 });

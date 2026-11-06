@@ -66,7 +66,13 @@ export default function RoomHeader({
           <Share2 className="mr-1 h-4 w-4" />
           Link
         </Button>
-        <Button type="button" variant="ghost" size="sm" onClick={onLeave}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50 hover:text-red-700"
+          onClick={onLeave}
+        >
           <LogOut className="mr-1 h-4 w-4" />
           Salir
         </Button>
