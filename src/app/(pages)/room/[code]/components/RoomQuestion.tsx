@@ -1,14 +1,12 @@
 'use client';
 
-import { CheckCircle2, Clock, Loader2, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { Progress } from '@/app/components/ui/progress';
+import QuizQuestionHeader from '@/app/components/quiz/QuizQuestionHeader';
+import QuizTimerBar from '@/app/components/quiz/QuizTimerBar';
+import QuizOptionButton, { QuizOptionState } from '@/app/components/quiz/QuizOptionButton';
 import { RoomLetter, RoomSnapshot } from '../types';
-import {
-  activePlayers,
-  answeredCount,
-  isReveal,
-} from '../utils/roomHelpers';
+import { activePlayers, answeredCount, isReveal } from '../utils/roomHelpers';
 import RoomReactions, { RoomReactionItem } from './RoomReactions';
 import RoomScoreboard from './RoomScoreboard';
 
@@ -23,12 +21,6 @@ interface RoomQuestionProps {
   onReact: (emoji: string) => void;
   reactions: RoomReactionItem[];
 }
-
-const timerColor = (progress: number) => {
-  if (progress > 50) return 'bg-cyan-500';
-  if (progress > 20) return 'bg-amber-500';
-  return 'bg-red-500';
-};
 
 export default function RoomQuestion({
   room,
@@ -60,25 +52,15 @@ export default function RoomQuestion({
     );
   }
 
-  const optionClass = (letter: RoomLetter) => {
-    const base =
-      'flex w-full items-center justify-between rounded-lg border-2 p-4 text-left transition-all';
+  const optionState = (letter: RoomLetter): QuizOptionState => {
     if (reveal) {
-      if (letter === question.correctOptionLetter) {
-        return `${base} border-green-500 bg-green-50`;
-      }
-      if (letter === myOption) {
-        return `${base} border-red-400 bg-red-50`;
-      }
-      return `${base} border-gray-200 bg-white opacity-60`;
+      if (letter === question.correctOptionLetter) return 'correct';
+      if (letter === myOption) return 'incorrect';
+      return 'muted';
     }
-    if (letter === myOption) {
-      return `${base} border-cyan-500 bg-cyan-50`;
-    }
-    if (disabled) {
-      return `${base} border-cyan-100 bg-white opacity-60`;
-    }
-    return `${base} border-cyan-100 bg-white hover:border-cyan-400 hover:bg-cyan-50`;
+    if (letter === myOption) return 'selected';
+    if (disabled) return 'muted';
+    return 'idle';
   };
 
   return (
@@ -87,20 +69,12 @@ export default function RoomQuestion({
         <CardHeader>
           {!reveal && (
             <>
-              <div className="mb-2 flex items-center justify-between text-sm font-medium text-cyan-800">
-                <span>
-                  Pregunta {question.number} de {room.questionCount}
-                </span>
-                <span className="flex items-center gap-1" aria-live="polite">
-                  <Clock className="h-4 w-4" />
-                  {remainingSeconds}s
-                </span>
-              </div>
-              <Progress
-                value={timerProgress}
-                className="h-2 bg-cyan-100"
-                indicatorClassName={timerColor(timerProgress)}
+              <QuizQuestionHeader
+                current={question.number}
+                total={room.questionCount}
+                secondsLeft={remainingSeconds}
               />
+              <QuizTimerBar value={timerProgress} />
             </>
           )}
           <CardTitle className="mt-4 text-xl leading-snug text-gray-900">
@@ -111,31 +85,16 @@ export default function RoomQuestion({
         <CardContent className="space-y-4">
           <div className="space-y-3" role="radiogroup" aria-label="Opciones de respuesta">
             {question.options.map((option) => (
-              <button
+              <QuizOptionButton
                 key={option.letter}
-                type="button"
-                role="radio"
-                aria-checked={myOption === option.letter}
+                letter={option.letter}
+                text={option.text}
+                state={optionState(option.letter)}
+                checked={myOption === option.letter}
+                pending={submitting && myOption === option.letter}
                 disabled={disabled}
-                onClick={() => onAnswer(option.letter)}
-                className={optionClass(option.letter)}
-              >
-                <span className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-100 text-sm font-bold text-cyan-800">
-                    {option.letter}
-                  </span>
-                  <span className="text-sm text-gray-800">{option.text}</span>
-                </span>
-                {submitting && myOption === option.letter && (
-                  <Loader2 className="h-5 w-5 animate-spin text-cyan-600" />
-                )}
-                {reveal && option.letter === question.correctOptionLetter && (
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                )}
-                {reveal && option.letter === myOption && option.letter !== question.correctOptionLetter && (
-                  <X className="h-5 w-5 text-red-500" />
-                )}
-              </button>
+                onSelect={() => onAnswer(option.letter)}
+              />
             ))}
           </div>
 

@@ -1,32 +1,47 @@
 'use client';
 
-import * as Progress from '@radix-ui/react-progress';
-import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import QuizTimerBar from './quiz/QuizTimerBar';
 
 export type TimerHandle = {
   stop: () => void;
   start: () => void;
   getElapsedTime: () => number;
 };
-const Timer = forwardRef<TimerHandle>((_, ref) => {
+
+const TOTAL_SECONDS = 50;
+
+interface TimerProps {
+  onTick?: (remainingSeconds: number, progress: number) => void;
+}
+
+const Timer = forwardRef<TimerHandle, TimerProps>(({ onTick }, ref) => {
   const [progress, setProgress] = useState(100);
+  const progressRef = useRef(100);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const elapsedTimeRef = useRef<number>(0);
+  const onTickRef = useRef(onTick);
+  onTickRef.current = onTick;
+
+  const applyProgress = (next: number) => {
+    progressRef.current = next;
+    setProgress(next);
+    onTickRef.current?.(Math.ceil((next / 100) * TOTAL_SECONDS), next);
+  };
 
   const startTimer = () => {
     if (!intervalRef.current) {
-      setProgress(100);
-      const totalSeconds = 50;
+      applyProgress(100);
       const intervalTime = 1000;
-      const decrement = 100 / totalSeconds;
+      const decrement = 100 / TOTAL_SECONDS;
 
       // Marca de tiempo al iniciar
       startTimeRef.current = Date.now();
       elapsedTimeRef.current = 0;
 
       intervalRef.current = setInterval(() => {
-        setProgress((prev) => Math.max(prev - decrement, 0));
+        applyProgress(Math.max(progressRef.current - decrement, 0));
       }, intervalTime);
     }
   };
@@ -54,22 +69,17 @@ const Timer = forwardRef<TimerHandle>((_, ref) => {
     getElapsedTime,
   }));
 
-  const getProgressBarColor = () => {
-    if (progress > 50) return 'bg-cyan-500';
-    if (progress > 20) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
-
-  return (
-    <div className="w-full py-4 border-round">
-      <Progress.Root className="relative h-3 bg-cyan-100 overflow-hidden rounded-full">
-        <Progress.Indicator
-          className={`h-full transition-transform duration-1000 ease-linear ${getProgressBarColor()}`}
-          style={{ transform: `translateX(-${100 - progress}%)` }}
-        />
-      </Progress.Root>
-    </div>
+  useEffect(
+    () => () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    },
+    [],
   );
+
+  return <QuizTimerBar value={progress} />;
 });
 
 Timer.displayName = 'Timer';
